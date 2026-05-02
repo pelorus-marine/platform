@@ -6,7 +6,7 @@ pub mod registry;
 pub mod wire;
 
 pub use protocol::{
-    decode_request_payload, derive_dcid, dcid_from_extended_id, encode_request_payload,
+    dcid_from_extended_id, decode_request_payload, derive_dcid, encode_request_payload,
     split_extended_id, DCID_ADDRESS_CLAIMED, DCID_REQUEST, DCID_TRANSPORT_CONNECTION,
     DCID_TRANSPORT_DATA,
 };
