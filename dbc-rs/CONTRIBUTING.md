@@ -91,7 +91,7 @@ cargo clippy --no-default-features --features heapless --target thumbv7em-none-e
 #### Code Style
 
 - Follow the existing code style in the project
-- Use `cargo fmt` to format your code (configuration is in `rustfmt.toml`)
+- Use `cargo fmt` to format your code — configuration is **`rustfmt.toml` in this crate**, which is the **canonical Pelorus rustfmt policy** (**`ecdis/`** intentionally mirrors these settings copy-for-copy; edit here first if you widen formatting rules)
 
 #### Documentation
 
