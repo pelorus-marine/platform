@@ -6,13 +6,13 @@ pub mod registry;
 pub mod wire;
 
 pub use protocol::{
+    DCID_ADDRESS_CLAIMED, DCID_REQUEST, DCID_TRANSPORT_CONNECTION, DCID_TRANSPORT_DATA,
     dcid_from_extended_id, decode_request_payload, derive_dcid, encode_request_payload,
-    split_extended_id, DCID_ADDRESS_CLAIMED, DCID_REQUEST, DCID_TRANSPORT_CONNECTION,
-    DCID_TRANSPORT_DATA,
+    split_extended_id,
 };
 pub use registry::{
-    core_wire_numeric_id, dcid_from_pelorus_extension_wire, pelorus_extension_wire_id, Dcid,
     DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_PELORUS_NETWORK_MANAGEMENT,
-    DCID_PELORUS_WAKE_UP_FRAME,
+    DCID_PELORUS_WAKE_UP_FRAME, Dcid, core_wire_numeric_id, dcid_from_pelorus_extension_wire,
+    pelorus_extension_wire_id,
 };
-pub use wire::{functional_groups, NmPayloadV1, NmState, WufPayloadV1};
+pub use wire::{NmPayloadV1, NmState, WufPayloadV1, functional_groups};

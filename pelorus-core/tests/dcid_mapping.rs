@@ -1,10 +1,10 @@
 //! DCID helpers (always built when running `cargo test`).
 
 use pelorus_core::dcid::{
-    core_wire_numeric_id, dcid_from_pelorus_extension_wire,
+    DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_PELORUS_NETWORK_MANAGEMENT,
+    DCID_PELORUS_WAKE_UP_FRAME, Dcid, core_wire_numeric_id, dcid_from_pelorus_extension_wire,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
-    pelorus_extension_wire_id, Dcid, DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1,
-    DCID_PELORUS_NETWORK_MANAGEMENT, DCID_PELORUS_WAKE_UP_FRAME,
+    pelorus_extension_wire_id,
 };
 
 #[test]

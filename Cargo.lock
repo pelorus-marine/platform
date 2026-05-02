@@ -724,7 +724,7 @@ dependencies = [
 
 [[package]]
 name = "dbc-rs"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "criterion",
  "embedded-can",
@@ -2115,7 +2115,7 @@ dependencies = [
 
 [[package]]
 name = "mdf4-rs"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "dbc-rs",
  "embedded-can",
@@ -2627,14 +2627,14 @@ checksum = "df94ce210e5bc13cb6651479fa48d14f601d9858cfe0467f43ae157023b938d3"
 
 [[package]]
 name = "pelorus-bounded"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "heapless",
 ]
 
 [[package]]
 name = "pelorus-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "dbc-rs",
  "embedded-can",
@@ -2643,7 +2643,7 @@ dependencies = [
 
 [[package]]
 name = "pelorus-inspector"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "chrono",
  "clap",
@@ -2671,14 +2671,14 @@ dependencies = [
 
 [[package]]
 name = "pelorus-m7"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "pelorus-core",
 ]
 
 [[package]]
 name = "pelorus-state"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "pelorus-core",
  "pelorus-stream",
@@ -2686,14 +2686,14 @@ dependencies = [
 
 [[package]]
 name = "pelorus-stream"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "pelorus-core",
 ]
 
 [[package]]
 name = "pelorus-vdr"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "pelorus-core",
  "tokio",

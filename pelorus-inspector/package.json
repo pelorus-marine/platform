@@ -1,6 +1,6 @@
 {
   "name": "pelorus-inspector",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Pelorus Inspector — CAN / MDF4 / DBC desktop tooling",
   "type": "module",
   "scripts": {

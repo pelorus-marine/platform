@@ -1,6 +1,6 @@
 [package]
 name = "pelorus-m7"
-version = "0.0.0"
+version = "0.0.1"
 edition = "2024"
 rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
@@ -12,7 +12,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-pelorus-core = { path = "../pelorus-core", default-features = false, features = ["canbus_heapless"] }
+pelorus-core = { path = "../pelorus-core", version = "0.1.1", default-features = false, features = ["canbus_heapless"] }
 
 [lints]
 workspace = true

@@ -1,8 +1,8 @@
 [package]
 name = "pelorus-stream"
-version = "0.1.0"
-edition = "2021"
-rust-version = "1.87.0"
+version = "0.1.1"
+edition = "2024"
+rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
 description = "Pelorus Stream subsystem — Ethernet / non-safety-critical transport"
 readme = "README.md"
@@ -14,7 +14,7 @@ std = ["pelorus-core/std"]
 alloc = []
 
 [dependencies]
-pelorus-core = { path = "../pelorus-core", default-features = false }
+pelorus-core = { path = "../pelorus-core", version = "0.1.1", default-features = false }
 
 [package.metadata.docs.rs]
 all-features = true

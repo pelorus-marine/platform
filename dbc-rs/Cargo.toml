@@ -1,12 +1,12 @@
 [package]
 name = "dbc-rs"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 authors = ["dbc-rs contributors"]
 repository = "https://github.com/pelorus-marine/platform"
 homepage = "https://github.com/pelorus-marine/platform/tree/main/dbc-rs"
-rust-version = "1.85.0"
+rust-version = "1.88.0"
 readme = "README.md"
 description = "Database CAN (DBC) parsing and editing library"
 documentation = "https://docs.rs/dbc-rs"
@@ -15,7 +15,7 @@ categories = ["parsing", "embedded"]
 exclude = [".github/", "examples/", "tests/"]
 
 [dependencies]
-pelorus-bounded = { path = "../pelorus-bounded", default-features = false }
+pelorus-bounded = { path = "../pelorus-bounded", version = "0.1.1", default-features = false }
 
 [dependencies.heapless]
 version = "0.9.2"

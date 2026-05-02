@@ -81,11 +81,15 @@ mod tests {
 
     #[test]
     fn pelorus_wire_frames_have_paths() {
-        assert!(correlation_for_dcid(Dcid::PelorusWakeUpFrame)
-            .vessel
-            .is_some());
-        assert!(correlation_for_dcid(Dcid::PelorusNetworkManagement)
-            .vessel
-            .is_some());
+        assert!(
+            correlation_for_dcid(Dcid::PelorusWakeUpFrame)
+                .vessel
+                .is_some()
+        );
+        assert!(
+            correlation_for_dcid(Dcid::PelorusNetworkManagement)
+                .vessel
+                .is_some()
+        );
     }
 }

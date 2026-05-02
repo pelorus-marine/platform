@@ -1,8 +1,9 @@
 [package]
 name = "pelorus-inspector"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 default-run = "pelorus-inspector"
+publish = false
 license = "MIT OR Apache-2.0"
 authors = ["Pelorus Inspector contributors"]
 repository = "https://github.com/pelorus-marine/platform"
@@ -42,8 +43,8 @@ thiserror = "2"
 log = "0.4"
 parking_lot = "0.12"
 
-dbc-rs = { path = "../dbc-rs", features = ["std", "embedded-can"] }
-mdf4-rs = { path = "../mdf4-rs" }
+dbc-rs = { path = "../dbc-rs", version = "0.5.1", features = ["std", "embedded-can"] }
+mdf4-rs = { path = "../mdf4-rs", version = "0.3.1" }
 
 embedded-can = { workspace = true }
 clap = { version = "4", features = ["derive"] }
