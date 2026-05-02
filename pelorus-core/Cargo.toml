@@ -8,6 +8,9 @@ description = "Pelorus Core integration — CAN FD, DCID, VDR, ECDIS own-ship (P
 readme = "README.md"
 repository = "https://github.com/pelorus-marine/platform"
 
+[build-dependencies]
+toml = "0.8"
+
 [dependencies]
 dbc-rs = { path = "../dbc-rs", version = "0.5.1", optional = true, default-features = false }
 mdf4-rs = { path = "../mdf4-rs", version = "0.3.1", optional = true, default-features = false }

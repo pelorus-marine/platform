@@ -2,11 +2,11 @@
 
 use pelorus_core::dcid::{
     DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_PELORUS_NETWORK_MANAGEMENT,
-    DCID_PELORUS_WAKE_UP_FRAME, Dcid, WireDcidClass, classify_core_wire, core_wire_numeric_id,
-    dcid_from_pelorus_extension_wire,
+    DCID_PELORUS_WAKE_UP_FRAME, Dcid, PelorusCoreReferenceMap, WireDcidClass, classify_core_wire,
+    core_wire_numeric_id, dcid_from_pelorus_extension_wire,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
     pelorus_extension_wire_id,
-    protocol::DCID_REQUEST,
+    protocol::dcid_from_extended_id,
     write_mdf4_pelorus_path,
 };
 
@@ -78,7 +78,7 @@ fn speed_through_water_distinct_from_sog() {
 
 #[test]
 fn classify_wire_distinguishes_protocol_and_signal_carriers() {
-    use pelorus_core::dcid::protocol::DCID_ADDRESS_CLAIMED;
+    use pelorus_core::dcid::protocol::{DCID_ADDRESS_CLAIMED, DCID_REQUEST};
     assert_eq!(
         classify_core_wire(DCID_ADDRESS_CLAIMED),
         WireDcidClass::ProtocolControl
@@ -94,6 +94,25 @@ fn classify_wire_distinguishes_protocol_and_signal_carriers() {
     assert_eq!(
         classify_core_wire(0xF004),
         WireDcidClass::Application { wire: 0xF004 }
+    );
+}
+
+#[test]
+fn reference_map_by_wire_and_extended_id() {
+    let m = PelorusCoreReferenceMap;
+    assert_eq!(
+        m.dcids_for_wire_dcid(DCID_PELORUS_WAKE_UP_FRAME),
+        &[Dcid::PelorusWakeUpFrame][..]
+    );
+    assert_eq!(
+        m.dcids_for_wire_dcid(DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1),
+        &[Dcid::EngineRpm(0)][..]
+    );
+    let ext = 0x18FF8003_u32;
+    assert_eq!(dcid_from_extended_id(ext), DCID_PELORUS_WAKE_UP_FRAME);
+    assert_eq!(
+        m.dcids_for_message(DbcMessageId(ext)),
+        &[Dcid::PelorusWakeUpFrame][..]
     );
 }
 

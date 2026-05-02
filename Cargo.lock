@@ -2639,6 +2639,7 @@ dependencies = [
  "dbc-rs",
  "embedded-can",
  "mdf4-rs",
+ "toml 0.8.2",
 ]
 
 [[package]]
