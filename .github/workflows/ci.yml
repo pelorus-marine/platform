@@ -1,8 +1,11 @@
 # Layout mirrors <https://github.com/pelorus-marine/ecdis/.github/workflows/ci.yml>:
-# checkout → pinned toolchain → test / clippy / fmt / doc. No ECDIS/UI system deps here.
+# checkout → pinned toolchain → test / clippy / fmt / doc.
+#
+# `pelorus-inspector` pulls in Tauri: Linux runners need GTK/WebKit packages and a
+# minimal `pelorus-inspector/dist/index.html` so `build.rs` and `cargo test` compile.
 #
 # Use `dtolnay/rust-toolchain@master` + `toolchain` input so optional `components`
-# (rustfmt, clippy) install correctly for the pinned MSRV.
+# (rustfmt, clippy) install correctly for the pinned toolchain.
 
 name: CI
 
@@ -21,9 +24,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Linux packages for Pelorus Inspector (Tauri)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Minimal dist for Pelorus Inspector build.rs
+        run: |
+          mkdir -p pelorus-inspector/dist
+          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.87.0"
+          toolchain: "1.88.0"
       - run: cargo test --workspace --all-features --verbose
 
   pelorus-core-canbus:
@@ -31,9 +51,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Linux packages for Pelorus Inspector (Tauri)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Minimal dist for Pelorus Inspector build.rs
+        run: |
+          mkdir -p pelorus-inspector/dist
+          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.87.0"
+          toolchain: "1.88.0"
       - run: cargo check -p pelorus-core --no-default-features --features canbus,alloc --verbose
 
   clippy:
@@ -41,9 +78,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Linux packages for Pelorus Inspector (Tauri)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Minimal dist for Pelorus Inspector build.rs
+        run: |
+          mkdir -p pelorus-inspector/dist
+          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.87.0"
+          toolchain: "1.88.0"
           components: clippy
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
@@ -54,7 +108,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.87.0"
+          toolchain: "1.88.0"
           components: rustfmt
       - run: cargo fmt --all -- --check
 
@@ -63,9 +117,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Linux packages for Pelorus Inspector (Tauri)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Minimal dist for Pelorus Inspector build.rs
+        run: |
+          mkdir -p pelorus-inspector/dist
+          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.87.0"
+          toolchain: "1.88.0"
       - env:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --workspace --no-deps --all-features
+
+  pelorus-inspector-frontend:
+    name: Pelorus Inspector (npm lint + tests + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pelorus-inspector
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: pelorus-inspector/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:run
+      - run: npx tsc --noEmit
+      - run: npm run build

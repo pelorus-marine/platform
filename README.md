@@ -21,7 +21,7 @@ This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog
 2. **Member subfolders only** — Every Rust package lives in its **own subdirectory** alongside this `Cargo.toml` and is listed under `[workspace].members`. The Core integration library (Cargo package **`pelorus-core`**) lives under **`pelorus-core/`**.
 3. **Safe Rust only** — Workspace-wide `unsafe_code = "forbid"` (`[workspace.lints]`), plus `#![forbid(unsafe_code)]` on each crate root.
 
-Rust **1.87.x** is pinned in **`rust-toolchain.toml`** (required by the in-tree **`mdf4-rs`** toolchain policy).
+Rust **1.88.x** is pinned in **`rust-toolchain.toml`** (required for **Pelorus Inspector** / Tauri transitive crates; the in-tree **`mdf4-rs`** policy remains edition **2024** with MSRV documented in that crate).
 
 ### Supporting libraries (`dbc-rs`, `mdf4-rs`)
 
@@ -47,7 +47,7 @@ Further context: normative specs stay in `specifications/`, the ECDIS app in `ec
 | **`pelorus-core/`** | **Package `pelorus-core`** — Pelorus CAN FD / DCID / VDR / own-ship; `SemanticPath` / `CorrelationSlot` |
 | **`pelorus-stream/`** | Stream telemetry envelope + future wire decoders |
 | **`pelorus-state/`** | State / fusion hooks over Core correlation (+ optional `stream`) |
-| **`pelorus-inspector/`** | Desktop CAN / MDF4 / signal inspection (**CLI scaffold**); successor to archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer) |
+| **`pelorus-inspector/`** | **Pelorus Inspector** — Tauri desktop MDF4 / DBC / SocketCAN tool (TypeScript + Rust); successor to archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer) |
 | **`dbc-rs/`** | DBC/CAN substrate (was subtree from archived [`reneherrero/dbc-rs`](https://github.com/reneherrero/dbc-rs)) |
 | **`mdf4-rs/`** | MDF4 substrate (was subtree from archived [`reneherrero/mdf4-rs`](https://github.com/reneherrero/mdf4-rs)) |
 

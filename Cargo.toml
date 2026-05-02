@@ -13,3 +13,7 @@ default-members = ["pelorus-core"]
 # Safe Rust only for every member that sets `[lints] workspace = true`.
 [workspace.lints.rust]
 unsafe_code = "forbid"
+
+# Rust 1.88 clippy is stricter here; mass reformatting gains little for this workspace.
+[workspace.lints.clippy]
+uninlined_format_args = "allow"

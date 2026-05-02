@@ -1,41 +1,49 @@
-//! Pelorus Inspector — CLI entry (scaffold). UI and recording paths will evolve here.
+//! Pelorus Inspector — Tauri app for MDF4 replay, SocketCAN capture, DBC decoding.
+//!
+//! Supports:
+//! - Live capture from SocketCAN interfaces (Linux)
+//! - MDF4 recordings
+//! - DBC-based signal decoding
 
 #![forbid(unsafe_code)]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+use clap::Parser;
+use pelorus_inspector::{AppState, InitialFiles, base_commands};
+use std::sync::Arc;
+
+/// Pelorus Inspector with MDF4 and SocketCAN support.
+#[derive(Parser, Debug)]
+#[command(author, version, about)]
+struct Args {
+    /// DBC file to load on startup
+    #[arg(short, long)]
+    dbc: Option<String>,
+
+    /// MDF4 file to load on startup
+    #[arg(short, long)]
+    mdf4: Option<String>,
+}
 
 fn main() {
-    print_banner();
-    let args = std::env::args_os().skip(1).collect::<Vec<_>>();
-    if args.iter().any(|a| a == "--help" || a == "-h") {
-        print_usage();
-        return;
-    }
-    if !args.is_empty() {
-        eprintln!("pelorus-inspector: unknown arguments (scaffold accepts only --help)");
-        std::process::exit(2);
-    }
-    println!(
-        "\n(No bus or files yet — integrate MDF4 / CAN / Pelorus Core next.)\n\
-         See README.md in this directory.\n"
-    );
+    let app_state = create_app_state();
+
+    tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_shell::init())
+        .manage(app_state)
+        .invoke_handler(base_commands!())
+        // Pro: add .setup(pro::setup) here
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
 
-fn print_banner() {
-    println!(
-        "pelorus-inspector {} — Pelorus Inspector (scaffold)",
-        env!("CARGO_PKG_VERSION")
-    );
-}
-
-fn print_usage() {
-    println!(
-        "\
-USAGE:
-    pelorus-inspector [OPTIONS]
-
-OPTIONS:
-    -h, --help    Print this message
-
-Pelorus maritime signal & wire inspection — scaffold build.
-"
-    );
+/// Create the application state from CLI args.
+fn create_app_state() -> Arc<AppState> {
+    let args = Args::parse();
+    let initial_files = InitialFiles {
+        dbc_path: args.dbc,
+        mdf4_path: args.mdf4,
+    };
+    Arc::new(AppState::with_initial_files(initial_files))
 }

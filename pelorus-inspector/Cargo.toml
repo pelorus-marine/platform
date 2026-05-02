@@ -1,18 +1,68 @@
 [package]
 name = "pelorus-inspector"
-version = "0.1.0"
-edition = "2021"
-rust-version = "1.87.0"
+version = "0.3.0"
+edition = "2024"
+default-run = "pelorus-inspector"
 license = "MIT OR Apache-2.0"
-description = "Pelorus Inspector — signal and wire inspection (CAN, MDF4, Pelorus); desktop tooling scaffold"
-readme = "README.md"
+authors = ["Pelorus Inspector contributors"]
 repository = "https://github.com/pelorus-marine/platform"
+homepage = "https://github.com/pelorus-marine/platform/tree/main/pelorus-inspector"
+rust-version = "1.88.0"
+readme = "README.md"
+description = "Pelorus Inspector — MDF4 / DBC decoding and SocketCAN inspection (Pelorus)."
 keywords = ["pelorus", "can", "mdf4", "dbc", "marine"]
-categories = ["command-line-utilities"]
+categories = ["visualization"]
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "tauri.conf.json",
+    "build.rs",
+    "icons/*",
+    "dist/**/*",
+    "capabilities/*",
+    "examples/*",
+    "gen/**/*",
+    "/README.md",
+    "/LICENSE-*",
+    "/LICENSING.md",
+]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-shell = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["sync", "rt"] }
+thiserror = "2"
+log = "0.4"
+parking_lot = "0.12"
+
+dbc-rs = { path = "../dbc-rs", features = ["std", "embedded-can"] }
+mdf4-rs = { path = "../mdf4-rs" }
+
+embedded-can = "0.4.1"
+clap = { version = "4", features = ["derive"] }
+dirs = "6"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+socketcan = "3"
+
+[lib]
+name = "pelorus_inspector"
+path = "src/lib.rs"
 
 [[bin]]
 name = "pelorus-inspector"
 path = "src/main.rs"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+devtools = ["tauri/devtools"]
 
 [lints]
 workspace = true

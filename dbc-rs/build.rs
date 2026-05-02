@@ -159,20 +159,17 @@ fn main() {
 
         for (env_var, value, const_name) in heapless_constants.iter() {
             if !is_power_of_2(*value) {
+                eprintln!("error: {const_name} must be a power of 2 when using `heapless` feature",);
+                eprintln!("  Current value: {value} (set via {env_var}={value})");
                 eprintln!(
-                    "error: {} must be a power of 2 when using `heapless` feature",
-                    const_name
-                );
-                eprintln!("  Current value: {} (set via {}={})", value, env_var, value);
-                eprintln!(
-                    "  {} is used with heapless collections which require power-of-2 capacities.",
-                    const_name
+                    "  {const_name} is used with heapless collections which require power-of-2 capacities.",
                 );
                 eprintln!(
                     "\nValid power-of-2 values: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, ..."
                 );
-                eprintln!("\nExample: Set {} to a power of 2:", env_var);
-                eprintln!("  {}={} cargo build ...", env_var, next_power_of_2(*value));
+                eprintln!("\nExample: Set {env_var} to a power of 2:");
+                let np = next_power_of_2(*value);
+                eprintln!("  {env_var}={np} cargo build ...");
                 std::process::exit(1);
             }
         }
@@ -184,24 +181,18 @@ fn main() {
 
     let mut limits_content = format!(
         r#"#[allow(dead_code)]
-pub const MAX_SIGNALS_PER_MESSAGE: usize = {};
+pub const MAX_SIGNALS_PER_MESSAGE: usize = {max_signals};
 #[allow(dead_code)]
-pub const MAX_MESSAGES: usize = {};
+pub const MAX_MESSAGES: usize = {max_messages};
 #[allow(dead_code)]
-pub const MAX_NODES: usize = {};
+pub const MAX_NODES: usize = {max_nodes};
 #[allow(dead_code)]
-pub const MAX_VALUE_DESCRIPTIONS: usize = {};
+pub const MAX_VALUE_DESCRIPTIONS: usize = {max_value_descriptions};
 #[allow(dead_code)]
-pub const MAX_NAME_SIZE: usize = {};
+pub const MAX_NAME_SIZE: usize = {max_name_size};
 #[allow(dead_code)]
-pub const MAX_EXTENDED_MULTIPLEXING: usize = {};
+pub const MAX_EXTENDED_MULTIPLEXING: usize = {max_extended_multiplexing};
 "#,
-        max_signals,
-        max_messages,
-        max_nodes,
-        max_value_descriptions,
-        max_name_size,
-        max_extended_multiplexing
     );
 
     // Add attribute constants only when feature is enabled
@@ -212,13 +203,12 @@ pub const MAX_EXTENDED_MULTIPLEXING: usize = {};
     ) {
         limits_content.push_str(&format!(
             r#"#[allow(dead_code)]
-pub const MAX_ATTRIBUTE_DEFINITIONS: usize = {};
+pub const MAX_ATTRIBUTE_DEFINITIONS: usize = {attr_defs};
 #[allow(dead_code)]
-pub const MAX_ATTRIBUTE_VALUES: usize = {};
+pub const MAX_ATTRIBUTE_VALUES: usize = {attr_vals};
 #[allow(dead_code)]
-pub const MAX_ATTRIBUTE_ENUM_VALUES: usize = {};
+pub const MAX_ATTRIBUTE_ENUM_VALUES: usize = {attr_enums};
 "#,
-            attr_defs, attr_vals, attr_enums
         ));
     }
 
