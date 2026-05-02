@@ -2,6 +2,9 @@
 //!
 //! Concrete tables are integration-specific (vessel DBC, OEM overlays). This module holds
 //! shared types only until generated bindings land.
+//!
+//! For normative **Pelorus Core numeric DCIDs** on the CAN FD bus (extensions in **07**, derivation
+//! in **03** §3.2), see [`super::registry::core_wire_numeric_id`] and related helpers on [`Dcid`].
 
 use super::Dcid;
 

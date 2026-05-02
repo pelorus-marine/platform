@@ -53,4 +53,4 @@ flowchart TB
   PSt -->|"fused views e.g. OwnShipSnapshot"| UI
 ```
 
-See `PELORUS_IMPLEMENTATION_PLAN.md` at the monorepo root.
+See **`../PELORUS_IMPLEMENTATION_PLAN.md`** in the **platform** repository root.

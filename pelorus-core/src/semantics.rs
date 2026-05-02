@@ -17,6 +17,7 @@ pub fn correlation_for_dcid(d: Dcid) -> CorrelationSlot<'static> {
         Dcid::GnssSpeedOverGround => {
             slot("Vessel.Navigation.GNSS.Level1.Navigation.SpeedOverGround")
         }
+        Dcid::SpeedThroughWater => slot("Vessel.Navigation.SpeedThroughWater"),
         Dcid::GnssCourseOverGround => {
             slot("Vessel.Navigation.GNSS.Level1.Navigation.CourseOverGround")
         }
@@ -31,6 +32,7 @@ pub fn correlation_for_dcid(d: Dcid) -> CorrelationSlot<'static> {
         Dcid::FuelFlowRate(_) => slot("Vessel.Propulsion.Engines[].FuelRate"),
         Dcid::EngineCoolantTemp(_) => slot("Vessel.Propulsion.Engines[].Coolant.Temperature"),
         Dcid::DepthBelowKeel => slot("Vessel.Navigation.Depth.Soundings.UnderKeel"),
+        Dcid::WaterTemperature => slot("Vessel.Environment.Water.Temperature"),
         Dcid::WindSpeedApparent => slot("Vessel.Environment.Wind.Apparent.Speed"),
         Dcid::WindAngleApparent => slot("Vessel.Environment.Wind.Apparent.Angle"),
         Dcid::PelorusWakeUpFrame => slot("Pelorus.Core.Power.WakeUpFrame"),
@@ -56,6 +58,18 @@ mod tests {
             Some(SemanticPath::from(
                 "Vessel.Navigation.GNSS.Level1.Position.Latitude"
             ))
+        );
+    }
+
+    #[test]
+    fn speed_through_water_and_water_temperature_paths() {
+        assert_eq!(
+            correlation_for_dcid(Dcid::SpeedThroughWater).vessel,
+            Some(SemanticPath::from("Vessel.Navigation.SpeedThroughWater"))
+        );
+        assert_eq!(
+            correlation_for_dcid(Dcid::WaterTemperature).vessel,
+            Some(SemanticPath::from("Vessel.Environment.Water.Temperature"))
         );
     }
 
