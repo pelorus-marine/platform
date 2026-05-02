@@ -1,0 +1,23 @@
+# Cargo / Rust — build artifact directory (workspace-local)
+/target
+**/target/
+
+# Debug / MSVC
+*.pdb
+
+# rustc / tooling
+*.rs.bk
+rust_out/
+
+# Coverage / profiling
+.coverage/
+*.profraw
+*.profdata
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*~
+
+.idea/
+.vscode/

@@ -1,0 +1,30 @@
+[package]
+name = "pelorus-platform"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Pelorus platform integration — Core CAN FD decode, DCID schema, VDR hooks, ECDIS snapshots"
+readme = "README.md"
+repository = "https://github.com/pelorus-marine/pelorus-marine"
+
+[dependencies]
+dbc-rs = { version = "0.4.3", optional = true, default-features = false }
+mdf4-rs = { version = "0.2.1", optional = true, default-features = false }
+embedded-can = { version = "0.4.1", optional = true }
+pelorus-semantics = { path = "../pelorus-semantics", optional = true, default-features = false }
+
+[features]
+default = ["std", "canbus", "vdr"]
+std = ["dbc-rs?/std", "mdf4-rs?/std", "pelorus-semantics?/std"]
+semantics = ["dep:pelorus-semantics"]
+alloc = ["dbc-rs?/alloc"]
+canbus = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/alloc"]
+vdr = ["dep:mdf4-rs", "dep:dbc-rs", "std", "mdf4-rs/std", "mdf4-rs/dbc", "dbc-rs/std"]
+hw_test = []
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lints]
+workspace = true

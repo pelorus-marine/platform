@@ -1,0 +1,24 @@
+[package]
+name = "pelorus-state"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Pelorus State subsystem — fusion and policy scaffold over Core + Stream"
+readme = "README.md"
+repository = "https://github.com/pelorus-marine/pelorus-marine"
+
+[dependencies]
+pelorus-semantics = { path = "../pelorus-semantics", default-features = false }
+pelorus-stream = { path = "../pelorus-stream", optional = true, default-features = false }
+
+[features]
+default = ["std"]
+std = ["pelorus-semantics/std", "pelorus-stream?/std"]
+stream = ["dep:pelorus-stream"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lints]
+workspace = true

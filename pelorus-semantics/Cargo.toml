@@ -1,0 +1,20 @@
+[package]
+name = "pelorus-semantics"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT OR Apache-2.0"
+description = "Shared Pelorus signal identity — correlate Core DCIDs with Stream/catalog paths"
+readme = "README.md"
+repository = "https://github.com/pelorus-marine/pelorus-marine"
+
+[features]
+default = ["std"]
+std = []
+alloc = []
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lints]
+workspace = true

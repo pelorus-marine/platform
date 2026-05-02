@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = [
+  "pelorus-semantics",
+  "pelorus-stream",
+  "pelorus-state",
+  "pelorus-platform",
+]
+default-members = ["pelorus-platform"]
+
+# Safe Rust only for every member that sets `[lints] workspace = true`.
+[workspace.lints.rust]
+unsafe_code = "forbid"
