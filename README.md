@@ -7,7 +7,23 @@ This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog
 
 - **By sailors, for sailors** — Bridge workflows, regulation, and life at sea set the bar; generic lab or automotive defaults do not.
 - **Pelorus first** — Product direction and **`specifications/`** define what ships first. Subtrees and crates.io are downstream of that.
-- **Embedded first** — **`no_std`**, bounded memory, and core trust boundaries (e.g. M-class vs Linux) shape APIs and CI from the start—not as a later retrofit.
+- **Embedded-first** — On-device code paths define trust and capacity budgets; see [Embedded-first](#embedded-first) below.
+
+## Embedded-first
+
+**This section is canonical for the workspace.** Crate READMEs link here instead of repeating the full policy.
+
+**Devices on the vessel—MCUs, bus gateways, sensors—are first-class citizens.** They are the **reference runtime** for what Pelorus must guarantee (semantics, timing, memory, failure modes). Host tools (**Inspector**, **`pelorus-agent`**, ECDIS consumers) **ingest and visualize** what those devices produce; they do not retroactively redefine “minimum viable” behavior in ways that break targets with fixed RAM and no desktop affordances.
+
+Concretely:
+
+- **`no_std` and bounded memory** shape APIs and reviews from the start. Prefer **explicit limits**, **deterministic errors** (no silent growth), and **optional features** so `std`, heavy serde trees, or unbounded heaps are not on the critical path for settlers.
+- **CI must exercise minimal feature sets**—e.g. `cargo check -p pelorus-core --no-default-features --features canbus,alloc` and equivalent paths for **`dbc-rs`** / **`mdf4-rs`**—so regressions show up before a product board does.
+- **`dbc-rs`** **`compat`** re-exports **`pelorus-bounded`** (`alloc` vs **`heapless`**) so DBC-shaped strings and collections match **_firmware_** policies, not only desktop parsers.
+- **`mdf4-rs`** today is **`no_std` + `alloc`** for writers and bus loggers where a **global allocator** is acceptable; targets that **cannot** use `alloc` need a **named, tiered story** (capped writer subset, ring-buffer + finalize, or host-side MDF packaging)—that gap is acknowledged and closed deliberately, not by pretending MDF equals laptop RAM.
+- **Bounded primitives** live in **`pelorus-bounded`**; **`pelorus-core`** selects **`canbus`** (**`alloc`**) or **`canbus_heapless`** instead of reinventing **`String<N>`** / **`Vec<T, N>`** beside **`dbc-rs`**.
+
+**Pelorus first** still resolves conflicts—but **embedded-first** means those conflicts are judged against **what ships on silicon**, not host convenience alone.
 
 ## Repository
 
@@ -48,6 +64,7 @@ Further context: normative specs stay in `specifications/`, the ECDIS app in `ec
 | **`pelorus-stream/`** | Stream telemetry envelope + future wire decoders |
 | **`pelorus-state/`** | State / fusion hooks over Core correlation (+ optional `stream`) |
 | **`pelorus-inspector/`** | **Pelorus Inspector** — Tauri desktop MDF4 / DBC / SocketCAN tool (TypeScript + Rust); successor to archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer) |
+| **`pelorus-bounded/`** | Bounded **`Vec` / `String` / `BTreeMap`** (`alloc` vs **`heapless`**) — shared with **`dbc-rs`** |
 | **`dbc-rs/`** | DBC/CAN substrate (was subtree from archived [`reneherrero/dbc-rs`](https://github.com/reneherrero/dbc-rs)) |
 | **`mdf4-rs/`** | MDF4 substrate (was subtree from archived [`reneherrero/mdf4-rs`](https://github.com/reneherrero/mdf4-rs)) |
 
@@ -56,6 +73,7 @@ cd platform
 cargo build --workspace
 cargo test --workspace --all-features
 cargo check -p pelorus-core --no-default-features --features canbus,alloc
+cargo check -p pelorus-core --no-default-features --features canbus_heapless
 ```
 
 Licensed **MIT OR Apache-2.0** (see `LICENSE-*` in this directory).

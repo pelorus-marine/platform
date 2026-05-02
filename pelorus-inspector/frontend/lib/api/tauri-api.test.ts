@@ -137,12 +137,12 @@ describe('TauriApi', () => {
         },
       ];
 
-      mockTauri.core.invoke.mockResolvedValue(mockSignals);
+      mockTauri.core.invoke.mockResolvedValue({ signals: mockSignals, errors: [] });
 
       const result = await api.decodeFrames(frames);
 
       expect(mockTauri.core.invoke).toHaveBeenCalledWith('decode_frames', { frames });
-      expect(result).toEqual(mockSignals);
+      expect(result).toEqual({ signals: mockSignals, errors: [] });
     });
   });
 
@@ -202,6 +202,7 @@ describe('TauriApi', () => {
       const mockInitial: InitialFiles = {
         dbc_path: '/test/file.dbc',
         mdf4_path: '/test/file.mf4',
+        vss_path: '/test/catalog.vspec',
       };
       mockTauri.core.invoke.mockResolvedValue(mockInitial);
 
@@ -215,6 +216,7 @@ describe('TauriApi', () => {
       const mockInitial: InitialFiles = {
         dbc_path: null,
         mdf4_path: null,
+        vss_path: null,
       };
       mockTauri.core.invoke.mockResolvedValue(mockInitial);
 
@@ -222,6 +224,7 @@ describe('TauriApi', () => {
 
       expect(result.dbc_path).toBeNull();
       expect(result.mdf4_path).toBeNull();
+      expect(result.vss_path).toBeNull();
     });
   });
 

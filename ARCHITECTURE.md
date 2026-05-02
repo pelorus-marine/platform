@@ -12,4 +12,10 @@ This directory (`./platform`) is the **Cargo workspace root** with a **virtual m
 
 Dependency direction: **`pelorus-core`** (lightweight, `default-features = false`) ← **stream**; **core** (+ optional **stream**) ← **state**. The **`semantics`** feature on **`pelorus-core`** only gates `correlation_for_dcid`; it does not pull a separate crate.
 
+## Embedded-first
+
+Workspace policy: **on-device targets are first-class**; normative narrative: [**Embedded-first**](README.md#embedded-first) in **`README.md`**.
+
+Pointers: [`pelorus-core/ARCHITECTURE.md`](pelorus-core/ARCHITECTURE.md) · **`pelorus-bounded`** (bounded collections; **`dbc-rs`** **`compat`** re-exports) · **`mdf4-rs`** ([`README.md`](mdf4-rs/README.md) / [`ARCHITECTURE.md`](mdf4-rs/ARCHITECTURE.md)).
+
 See `PELORUS_IMPLEMENTATION_PLAN.md` at the monorepo root.

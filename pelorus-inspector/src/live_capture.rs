@@ -4,9 +4,24 @@
 //! MDF4 logging happens in the socket thread for lossless capture.
 
 use crate::dto::{CanFrameDto, CaptureStatsDto, LiveCaptureUpdate, StatsHtml};
+use crate::vss::VssMatchIndex;
 use dbc_rs::FastDbc;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::time::Instant;
+
+fn html_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            _ => out.push(c),
+        }
+    }
+    out
+}
 
 /// Maximum recent frames to keep for the frame stream view.
 const MAX_RECENT_FRAMES: usize = 100;
@@ -49,6 +64,8 @@ struct SignalEntry {
     message_name: String,
     value: f64,
     unit: String,
+    /// Matched **`Vessel.*`** path when a catalog is loaded (leaf-name heuristic).
+    vessel_path: Option<String>,
     last_update: f64,
     // History for sparkline
     history: VecDeque<f64>,
@@ -83,6 +100,9 @@ pub struct LiveCaptureState {
     // FastDbc for O(1) message lookup and zero-allocation decoding
     fast_dbc: Option<FastDbc>,
 
+    /// Optional VSS correlation for signal monitor rows.
+    vss_match: Option<VssMatchIndex>,
+
     // Pre-allocated decode buffer (sized for max signals in any message)
     decode_buffer: Vec<f64>,
 
@@ -100,7 +120,11 @@ impl LiveCaptureState {
     ///
     /// Takes an optional `FastDbc` for high-performance O(1) message lookup
     /// and zero-allocation decoding in the hot path.
-    pub fn new(capture_file: String, fast_dbc: Option<FastDbc>) -> Self {
+    pub fn new(
+        capture_file: String,
+        fast_dbc: Option<FastDbc>,
+        vss_match: Option<VssMatchIndex>,
+    ) -> Self {
         // Pre-allocate decode buffer based on max signals in any message
         let decode_buffer = fast_dbc
             .as_ref()
@@ -118,6 +142,7 @@ impl LiveCaptureState {
             frame_count: 0,
             start_time: Instant::now(),
             fast_dbc,
+            vss_match,
             decode_buffer,
             decode_blacklist: HashSet::new(),
             last_rate_update: Instant::now(),
@@ -268,6 +293,11 @@ impl LiveCaptureState {
                 // First time seeing this signal - allocate names (one-time cost)
                 let mut history = VecDeque::with_capacity(MAX_HISTORY_POINTS);
                 history.push_back(value);
+                let vessel_path = self
+                    .vss_match
+                    .as_ref()
+                    .and_then(|m| m.lookup(signal.name()))
+                    .map(std::string::ToString::to_string);
                 self.signals.insert(
                     key,
                     SignalEntry {
@@ -275,6 +305,7 @@ impl LiveCaptureState {
                         message_name: message_name.to_string(),
                         value,
                         unit: signal.unit().unwrap_or("").to_string(),
+                        vessel_path,
                         last_update: timestamp,
                         history,
                         min_value: value,
@@ -407,6 +438,7 @@ impl LiveCaptureState {
                 "<div class=\"cv-signal-row\">\
                     <div class=\"cv-signal-info\">\
                         <span class=\"cv-signal-name\">{}</span>\
+                        {}\
                         <span class=\"cv-signal-value\">{} <span class=\"cv-signal-unit\">{}</span></span>\
                     </div>\
                     <div class=\"cv-signal-chart\">\
@@ -415,7 +447,16 @@ impl LiveCaptureState {
                         <span class=\"cv-signal-max\">{}</span>\
                     </div>\
                 </div>",
-                e.signal_name, value_str, e.unit, min_str, sparkline, max_str
+                e.signal_name,
+                e.vessel_path.as_ref().map(|p| format!(
+                    "<span class=\"cv-signal-vessel\" title=\"Pelorus VSS path\">{}</span>",
+                    html_escape(p)
+                )).unwrap_or_default(),
+                value_str,
+                e.unit,
+                min_str,
+                sparkline,
+                max_str
             ));
         }
 

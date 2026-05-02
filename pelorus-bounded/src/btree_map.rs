@@ -3,9 +3,10 @@
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+use crate::error::Result;
+
 #[cfg(not(feature = "alloc"))]
 use crate::error::Error;
-use crate::error::Result;
 
 #[cfg(feature = "alloc")]
 type Inner<K, V, const N: usize> = alloc::collections::BTreeMap<K, V>;
@@ -14,14 +15,12 @@ type Inner<K, V, const N: usize> = heapless::LinearMap<K, V, N>;
 
 /// An ordered map based on a B-Tree (with `alloc`) or a linear map (with `heapless`).
 ///
-/// When `alloc` feature is enabled, this is a wrapper around `alloc::collections::BTreeMap`.
 /// When `heapless` feature is enabled, this is a wrapper around `heapless::LinearMap<K, V, N>`.
 ///
 /// Note: With heapless, iteration order is insertion order, not key order.
 #[allow(dead_code)]
 pub struct BTreeMap<K, V, const N: usize>(Inner<K, V, N>);
 
-// Manual Clone implementation with proper bounds
 impl<K, V, const N: usize> Clone for BTreeMap<K, V, N>
 where
     K: Clone + Eq,
@@ -32,7 +31,6 @@ where
     }
 }
 
-// Manual Debug implementation with proper bounds
 impl<K, V, const N: usize> core::fmt::Debug for BTreeMap<K, V, N>
 where
     K: core::fmt::Debug + Eq,
@@ -88,7 +86,7 @@ where
         {
             self.0
                 .insert(key, value)
-                .map_err(|_| Error::Validation(crate::error::Error::MAX_NAME_SIZE_EXCEEDED))
+                .map_err(|_| Error::CapacityExceeded)
         }
     }
 
@@ -185,7 +183,6 @@ where
         }
         #[cfg(not(feature = "alloc"))]
         {
-            // For heapless LinearMap, compare by iterating
             if self.len() != other.len() {
                 return false;
             }

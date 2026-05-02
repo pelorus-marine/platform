@@ -6,3 +6,5 @@
 - **Does not** implement **Pelorus State** or CAN decode — see sibling **`pelorus-state/`** and **`pelorus-core/`** (Core integration crate).
 
 Workspace root: `../README.md`.
+
+**Embedded-first:** Stream framing stays **`no_std`**-compatible where specified; **[Embedded-first](../README.md#embedded-first)**.

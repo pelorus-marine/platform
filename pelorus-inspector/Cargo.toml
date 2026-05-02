@@ -9,7 +9,7 @@ repository = "https://github.com/pelorus-marine/platform"
 homepage = "https://github.com/pelorus-marine/platform/tree/main/pelorus-inspector"
 rust-version = "1.88.0"
 readme = "README.md"
-description = "Pelorus Inspector — MDF4 / DBC decoding and SocketCAN inspection (Pelorus)."
+description = "Pelorus Inspector — MDF4 / DBC decoding and SocketCAN inspection; includes pelorus-agent CLI for automation."
 keywords = ["pelorus", "can", "mdf4", "dbc", "marine"]
 categories = ["visualization"]
 include = [
@@ -36,6 +36,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-shell = "2"
 serde = { workspace = true, features = ["derive", "std"] }
 serde_json = { workspace = true }
+serde_yaml = "0.9"
 tokio = { version = "1", features = ["sync", "rt", "macros", "rt-multi-thread"] }
 thiserror = "2"
 log = "0.4"
@@ -63,6 +64,10 @@ path = "src/lib.rs"
 [[bin]]
 name = "pelorus-inspector"
 path = "src/main.rs"
+
+[[bin]]
+name = "pelorus-agent"
+path = "src/bin/pelorus-agent.rs"
 
 [features]
 default = ["custom-protocol"]

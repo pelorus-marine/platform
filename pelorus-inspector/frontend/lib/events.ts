@@ -3,7 +3,7 @@
  */
 
 import mitt from 'mitt';
-import type { CanFrame, DbcInfo, DecodedSignal } from './types';
+import type { CanFrame, DbcInfo, DecodedSignal, VssSnapshotDto } from './types';
 
 /** Payload when an event has no fields (emit with `EMPTY_PAYLOAD`). */
 export type EmptyPayload = Record<string, never>;
@@ -27,6 +27,21 @@ export interface DbcStateChangeEvent {
   isEditing: boolean;
   currentFile: string | null;
   messageCount: number;
+}
+
+/** VSS (.vspec) catalog load / update / clear */
+export interface VssChangedEvent {
+  action: 'loaded' | 'cleared' | 'updated' | 'new';
+  snapshot: VssSnapshotDto | null;
+  filename: string | null;
+}
+
+export interface VssStateChangeEvent {
+  isDirty: boolean;
+  isEditing: boolean;
+  currentFile: string | null;
+  leafCount: number;
+  branchCount: number;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -282,6 +297,8 @@ export type CanRefreshEvent = EmptyPayload;
 export type AppEvents = {
   'dbc:changed': DbcChangedEvent;
   'dbc:state-change': DbcStateChangeEvent;
+  'vss:changed': VssChangedEvent;
+  'vss:state-change': VssStateChangeEvent;
   'mdf4:changed': Mdf4ChangedEvent;
   'frame:selected': FrameSelectedEvent;
   'capture:started': CaptureStartedEvent;
@@ -356,6 +373,14 @@ export function emitDbcChanged(payload: DbcChangedEvent): void {
 
 export function emitDbcStateChange(payload: DbcStateChangeEvent): void {
   events.emit('dbc:state-change', payload);
+}
+
+export function emitVssChanged(payload: VssChangedEvent): void {
+  events.emit('vss:changed', payload);
+}
+
+export function emitVssStateChange(payload: VssStateChangeEvent): void {
+  events.emit('vss:state-change', payload);
 }
 
 export function emitMdf4Changed(payload: Mdf4ChangedEvent): void {

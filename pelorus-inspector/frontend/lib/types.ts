@@ -20,6 +20,8 @@ export interface DecodedSignal {
   raw_value: number;
   unit: string;
   description?: string;
+  /** Pelorus `Vessel.*` path when VSS catalog matches (leaf-name heuristic). */
+  vessel_path?: string;
 }
 
 /** Response from decode command, including any errors */
@@ -210,6 +212,34 @@ export interface DbcInfo {
 export interface InitialFiles {
   dbc_path: string | null;
   mdf4_path: string | null;
+  vss_path: string | null;
+}
+
+/** Serializable VSS tree node (.vspec). */
+export interface VssNodeDto {
+  segment: string;
+  path: string;
+  meta: Record<string, unknown>;
+  children: VssNodeDto[];
+}
+
+export interface VssCatalogDto {
+  roots: VssNodeDto[];
+}
+
+export interface VssLeafDto {
+  path: string;
+  node_type?: string;
+  datatype?: string;
+  unit?: string;
+  description?: string;
+}
+
+export interface VssSnapshotDto {
+  roots: VssNodeDto[];
+  leaves: VssLeafDto[];
+  branch_count: number;
+  leaf_count: number;
 }
 
 /** Pelorus Inspector configuration */
@@ -218,6 +248,8 @@ export interface InspectorConfig {
   appName?: string;
   /** Show DBC tab */
   showDbcTab?: boolean;
+  /** Show VSS (.vspec) catalog tab */
+  showVssTab?: boolean;
   /** Show Live Capture tab */
   showLiveTab?: boolean;
   /** Show MDF4 tab */
@@ -264,6 +296,22 @@ export interface InspectorApi {
   saveDbcContent(path: string, content: string): Promise<void>;
   /** Update in-memory DBC for live decoding (does not save to file) */
   updateDbcContent(content: string): Promise<string>;
+  /** Load Pelorus VSS (.vspec) YAML catalog */
+  loadVss(path: string): Promise<VssSnapshotDto>;
+  /** Clear loaded VSS catalog (`emitChanged`: notify UI via backend event + mitt; default true) */
+  clearVss(emitChanged?: boolean): Promise<void>;
+  /** Current VSS file path */
+  getVssPath(): Promise<string | null>;
+  /** Tree + leaves snapshot for UI */
+  getVssSnapshot(): Promise<VssSnapshotDto | null>;
+  /** Save VSS YAML (validated server-side) */
+  saveVssContent(path: string, content: string): Promise<void>;
+  /** Replace in-memory catalog from YAML */
+  updateVssContent(content: string): Promise<string>;
+  /** Structured catalog round-trip */
+  updateVssCatalog(dto: VssCatalogDto): Promise<VssSnapshotDto>;
+  /** Emit YAML from structured roots */
+  serializeVssCatalog(dto: VssCatalogDto): Promise<string>;
   /** Open file dialog for loading */
   openFileDialog(filters: FileFilter[]): Promise<string | null>;
   /** Open file dialog for saving */

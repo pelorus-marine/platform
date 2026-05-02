@@ -17,6 +17,7 @@ export {
 export const defaultConfig: Required<InspectorConfig> = {
   appName: 'Pelorus Inspector',
   showDbcTab: true,
+  showVssTab: true,
   showLiveTab: true,
   showMdf4Tab: true,
   showAboutTab: true,

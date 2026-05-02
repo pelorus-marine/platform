@@ -23,6 +23,17 @@ See workspace **`README.md`** at **`../README.md`** (`platform/` root).
 
 **Rule:** do not add Stream codecs or State fusion engines *into this crate*; keep bounded dependencies and M7-safe feature sets.
 
+## Embedded-first (this crate)
+
+**MCU-class builds are a primary audience**, not a fork:
+
+- Start from **`default-features = false`**, then enable **`canbus`**, **`semantics`**, and **`alloc`** only where needed; omit **`vdr`** and **`std`** on bare metal when chart/VDR glue is elsewhere.
+- **`vdr`** pulls MDF4-oriented naming and helpers suitable for Linux-grade hosts; **CAN FD decode and DCID semantics do not depend on `vdr`** for existence proofs on an M-class core.
+- **`dbc-rs`** enters via **`canbus`** (**`alloc`**) or **`canbus_heapless`** (**`dbc-rs/heapless`**); bounded collections live in **`pelorus-bounded`** (used by **`dbc-rs`**).
+- Keep **Stream** and **State** out of this package (workspace siblings); preserves a thin cone for settlers.
+
+Workspace narrative: **[`README.md` § Embedded-first](../README.md#embedded-first)**.
+
 ## Dependency direction
 
 ```mermaid

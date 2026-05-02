@@ -17,6 +17,14 @@ Crates.io releases are published from the **[`pelorus-marine/platform`](https://
 - **Memory safe** - `forbid(unsafe_code)` enforced
 - **Full read/write** - Parse, modify, and serialize DBC files
 
+## Embedded-first
+
+Workspace policy (normative): **[Embedded-first](../README.md#embedded-first)**.
+
+DBC-facing specifics: **`no_std`** with **`heapless`** or **`alloc`**; compile-time **`MAX_*`** caps (**`build.rs`**); **`pelorus-bounded`** primitives re-exported from **`compat/`**. **`pelorus-core`**: **`canbus`** (**`alloc`**) or **`canbus_heapless`**.
+
+Further detail: [`ARCHITECTURE.md`](ARCHITECTURE.md#embedded-first).
+
 ## Quick Start
 
 ```toml
@@ -85,7 +93,7 @@ considered a minor breaking change and will be noted in release notes.
 ## Documentation
 
 - [API Reference](https://docs.rs/dbc-rs)
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Internal design
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Internal design (includes [Embedded-first](./ARCHITECTURE.md#embedded-first))
 - [SPECIFICATIONS.md](./SPECIFICATIONS.md) - DBC format reference
 - [SECURITY.md](./SECURITY.md) - Security audit
 

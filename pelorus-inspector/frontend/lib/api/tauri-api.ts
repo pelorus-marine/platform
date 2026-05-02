@@ -8,6 +8,8 @@ import type {
   FileFilter,
   LiveCaptureUpdate,
   CanBpfFilter,
+  VssSnapshotDto,
+  VssCatalogDto,
 } from '../types';
 
 import { assertTauriReady, invoke, listen, dialogs } from '../ipc.js';
@@ -83,6 +85,38 @@ export class TauriApi implements InspectorApi {
 
   async updateDbcContent(content: string): Promise<string> {
     return invoke('update_dbc_content', { content }) as Promise<string>;
+  }
+
+  async loadVss(path: string): Promise<VssSnapshotDto> {
+    return invoke('load_vss', { path }) as Promise<VssSnapshotDto>;
+  }
+
+  async clearVss(emitChanged = true): Promise<void> {
+    await invoke('clear_vss', { emitChanged });
+  }
+
+  async getVssPath(): Promise<string | null> {
+    return invoke('get_vss_path') as Promise<string | null>;
+  }
+
+  async getVssSnapshot(): Promise<VssSnapshotDto | null> {
+    return invoke('get_vss_snapshot') as Promise<VssSnapshotDto | null>;
+  }
+
+  async saveVssContent(path: string, content: string): Promise<void> {
+    await invoke('save_vss_content', { path, content });
+  }
+
+  async updateVssContent(content: string): Promise<string> {
+    return invoke('update_vss_content', { content }) as Promise<string>;
+  }
+
+  async updateVssCatalog(dto: VssCatalogDto): Promise<VssSnapshotDto> {
+    return invoke('update_vss_catalog', { dto }) as Promise<VssSnapshotDto>;
+  }
+
+  async serializeVssCatalog(dto: VssCatalogDto): Promise<string> {
+    return invoke('serialize_vss_catalog', { dto }) as Promise<string>;
   }
 
   async openFileDialog(filters: FileFilter[]): Promise<string | null> {

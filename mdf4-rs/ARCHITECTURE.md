@@ -2,7 +2,15 @@
 
 This document describes the internal architecture of the `mdf4-rs` library.
 
-## Design Principles
+## Embedded-first
+
+Workspace policy: **[Embedded-first](../README.md#embedded-first)**.
+
+MDF specifics: readers lean on streaming/lazy decode ([Design Principles](#design-principles)); writers, CAN/Ethernet loggers, and **`dbc`** paths require **`alloc`** today. Heapless writer/logging tiers are **[backlog](#bounded-heapless-writers-backlog)** only—do not assume them from defaults.
+
+### Bounded heapless writers (backlog)
+
+Current stack: **`alloc`** throughout **`writer/`** and loggers. A tiered embedded path would use capped buffers, ring queues with host-side MDF assembly, or similar—not a silent semantic equivalent of today’s defaults. **DBC bounded collections** remain **`pelorus-bounded`** via **`dbc-rs`**; MDF-native heapless logging is unscoped until product locks requirements.
 
 1. **Zero Unsafe Code** - The crate uses `#![forbid(unsafe_code)]` to guarantee memory safety at compile time
 

@@ -11,7 +11,7 @@
 
 use clap::Parser;
 use pelorus_inspector::{
-    storage::StorageState, AppState, InitialFiles, SimulatorState, WorkflowState, base_commands,
+    AppState, InitialFiles, SimulatorState, WorkflowState, base_commands, storage::StorageState,
 };
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -27,6 +27,10 @@ struct Args {
     /// MDF4 file to load on startup
     #[arg(short, long)]
     mdf4: Option<String>,
+
+    /// VSS (.vspec) catalog to load on startup
+    #[arg(long)]
+    vss: Option<String>,
 }
 
 fn app_data_directory() -> PathBuf {
@@ -61,6 +65,7 @@ fn create_app_state() -> Arc<AppState> {
     let initial_files = InitialFiles {
         dbc_path: args.dbc,
         mdf4_path: args.mdf4,
+        vss_path: args.vss,
     };
     Arc::new(AppState::with_initial_files(initial_files))
 }

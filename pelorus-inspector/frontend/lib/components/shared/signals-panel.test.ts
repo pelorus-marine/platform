@@ -24,7 +24,7 @@ describe('SignalsPanelElement', () => {
       </div>
       <div class="cv-table-wrapper">
         <table class="cv-table">
-          <thead><tr><th>Signal</th><th>Value</th><th>Unit</th></tr></thead>
+          <thead><tr><th>Signal</th><th>Value</th><th>Unit</th><th>Vessel (VSS)</th></tr></thead>
           <tbody id="signalsTableBody"></tbody>
         </table>
       </div>
@@ -95,6 +95,19 @@ describe('SignalsPanelElement', () => {
       const tbody = element.querySelector('#signalsTableBody');
       expect(tbody?.innerHTML).toContain('85.5000');
       expect(tbody?.innerHTML).toContain('C');
+    });
+
+    it('should render vessel_path when present', () => {
+      const signals = [
+        createMockSignal({
+          signal_name: 'RPM',
+          vessel_path: 'Vessel.Platform.Engine.RPM',
+        }),
+      ];
+      element.setSignals(signals);
+
+      const tbody = element.querySelector('#signalsTableBody');
+      expect(tbody?.innerHTML).toContain('Vessel.Platform.Engine.RPM');
     });
   });
 

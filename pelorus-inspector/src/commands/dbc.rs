@@ -1,6 +1,6 @@
 //! DBC file loading and management commands.
 
-use crate::decode::{DecodeResult, decode_frame};
+use crate::agent::ops::{decode_frames as decode_frames_inner, load_dbc as load_dbc_inner};
 use crate::dto::{
     AttributeAssignmentInfo, AttributeDefaultInfo, AttributeDefinitionInfo, AttributeTargetInfo,
     AttributeValueInfo, AttributeValueType, BitTimingInfo, CanFrameDto, DbcInfo, DecodeResponse,
@@ -16,21 +16,7 @@ use tauri::State;
 /// Saves the path to session config for persistence.
 #[tauri::command]
 pub async fn load_dbc(path: String, state: State<'_, Arc<AppState>>) -> Result<String, String> {
-    let content =
-        std::fs::read_to_string(&path).map_err(|e| format!("Failed to read DBC: {}", e))?;
-
-    let dbc = Dbc::parse(&content).map_err(|e| format!("Failed to parse DBC: {:?}", e))?;
-    let msg_count = dbc.messages().len();
-
-    state.set_dbc(dbc);
-    *state.dbc_path.lock() = Some(path.clone());
-
-    // Save to session config for persistence
-    if let Err(e) = state.session.lock().set_dbc_path(Some(path.clone())) {
-        log::warn!("Failed to save session: {}", e);
-    }
-
-    Ok(format!("Loaded {} messages", msg_count))
+    load_dbc_inner(&state, &path)
 }
 
 /// Clear the loaded DBC data.
@@ -60,24 +46,7 @@ pub async fn decode_single_frame(
     frame: CanFrameDto,
     state: State<'_, Arc<AppState>>,
 ) -> Result<DecodeResponse, String> {
-    let dbc_guard = state.dbc.lock();
-    let Some(ref dbc) = *dbc_guard else {
-        return Ok(DecodeResponse {
-            signals: Vec::new(),
-            errors: Vec::new(),
-        });
-    };
-
-    match decode_frame(&frame, dbc) {
-        DecodeResult::Signals(signals) => Ok(DecodeResponse {
-            signals,
-            errors: Vec::new(),
-        }),
-        DecodeResult::Error(err) => Ok(DecodeResponse {
-            signals: Vec::new(),
-            errors: vec![err],
-        }),
-    }
+    Ok(decode_frames_inner(&state, std::slice::from_ref(&frame)))
 }
 
 /// Decode multiple CAN frames using the loaded DBC.
@@ -86,25 +55,7 @@ pub async fn decode_frames(
     frames: Vec<CanFrameDto>,
     state: State<'_, Arc<AppState>>,
 ) -> Result<DecodeResponse, String> {
-    let dbc_guard = state.dbc.lock();
-    let Some(ref dbc) = *dbc_guard else {
-        return Ok(DecodeResponse {
-            signals: Vec::new(),
-            errors: Vec::new(),
-        });
-    };
-
-    let mut signals = Vec::new();
-    let mut errors = Vec::new();
-
-    for frame in &frames {
-        match decode_frame(frame, dbc) {
-            DecodeResult::Signals(sigs) => signals.extend(sigs),
-            DecodeResult::Error(err) => errors.push(err),
-        }
-    }
-
-    Ok(DecodeResponse { signals, errors })
+    Ok(decode_frames_inner(&state, &frames))
 }
 
 /// Save DBC content to a file.
@@ -147,14 +98,8 @@ pub async fn update_dbc_content(
     Ok(format!("Updated DBC with {} messages", msg_count))
 }
 
-/// Get information about the loaded DBC.
-#[tauri::command]
-pub async fn get_dbc_info(state: State<'_, Arc<AppState>>) -> Result<Option<DbcInfo>, String> {
-    let dbc_guard = state.dbc.lock();
-    let Some(ref dbc) = *dbc_guard else {
-        return Ok(None);
-    };
-
+/// Build a structured view of `dbc` for JSON / automation (also used by `pelorus-agent dbc-info`).
+pub fn build_dbc_info(dbc: &Dbc) -> DbcInfo {
     // Extract nodes
     let nodes: Vec<NodeInfo> = dbc
         .nodes()
@@ -328,7 +273,7 @@ pub async fn get_dbc_info(state: State<'_, Arc<AppState>>) -> Result<Option<DbcI
         })
     });
 
-    Ok(Some(DbcInfo {
+    DbcInfo {
         version: dbc.version().map(|v| v.to_string()),
         bit_timing,
         comment: dbc.comment().map(|s| s.to_string()),
@@ -339,7 +284,17 @@ pub async fn get_dbc_info(state: State<'_, Arc<AppState>>) -> Result<Option<DbcI
         attribute_defaults,
         attribute_values,
         extended_multiplexing,
-    }))
+    }
+}
+
+/// Get information about the loaded DBC.
+#[tauri::command]
+pub async fn get_dbc_info(state: State<'_, Arc<AppState>>) -> Result<Option<DbcInfo>, String> {
+    let dbc_guard = state.dbc.lock();
+    let Some(ref dbc) = *dbc_guard else {
+        return Ok(None);
+    };
+    Ok(Some(build_dbc_info(dbc)))
 }
 
 fn convert_attribute_value(value: &dbc_rs::AttributeValue) -> AttributeValueInfo {

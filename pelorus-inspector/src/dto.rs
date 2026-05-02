@@ -298,6 +298,9 @@ pub struct DecodedSignalDto {
     pub unit: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+    /// Matched **`Vessel.*`** catalog path when a VSS (.vspec) file is loaded (heuristic leaf-name match).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub vessel_path: Option<String>,
 }
 
 impl DecodedSignalDto {
@@ -306,6 +309,7 @@ impl DecodedSignalDto {
         sig: &dbc_rs::DecodedSignal<'_>,
         timestamp: f64,
         message_name: &str,
+        vessel_path: Option<String>,
     ) -> Self {
         Self {
             timestamp,
@@ -315,8 +319,51 @@ impl DecodedSignalDto {
             raw_value: sig.raw_value,
             unit: sig.unit.unwrap_or("").to_string(),
             description: sig.description.map(|s| s.to_string()),
+            vessel_path,
         }
     }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VSS (.vspec) catalog DTOs
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Serializable VSS tree node for the Inspector UI.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VssNodeDto {
+    pub segment: String,
+    pub path: String,
+    #[serde(default)]
+    pub meta: serde_json::Map<String, serde_json::Value>,
+    #[serde(default)]
+    pub children: Vec<VssNodeDto>,
+}
+
+/// Full editable catalog snapshot (roots only — paths duplicate segments).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VssCatalogDto {
+    pub roots: Vec<VssNodeDto>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VssLeafDto {
+    pub path: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub node_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub datatype: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VssSnapshotDto {
+    pub roots: Vec<VssNodeDto>,
+    pub leaves: Vec<VssLeafDto>,
+    pub branch_count: usize,
+    pub leaf_count: usize,
 }
 
 /// Response from decode_frames command, including any errors.

@@ -3,6 +3,7 @@
 //! Different from simulator engine - focused on processing/transforming frames.
 
 #![allow(dead_code)] // Engine not yet integrated into workflow executor
+#![allow(clippy::arc_with_non_send_sync)] // Rhai `Dynamic` state is not `Sync`; `Arc` is shared only with Rhai engine callbacks.
 
 use crate::dto::CanFrameDto;
 use rhai::{AST, CallFnOptions, Dynamic, Engine, Scope};

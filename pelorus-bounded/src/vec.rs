@@ -15,7 +15,10 @@ type Inner<T, const N: usize> = heapless::Vec<T, N>;
 /// A contiguous growable array type.
 ///
 /// When `heapless` feature is enabled, this is wrapper around `heapless::Vec`. Otherwise, this is
-/// a wrapper around `alloc::vec::Vec`, setting the initial capacity to `N`.
+/// a wrapper around `alloc::vec::Vec`, sized so logical length never exceeds `N`.
+///
+/// For [`FromIterator`], iteration stops at `N` elements; yielding more panics with the same message
+/// as `heapless::Vec` (`"Vec::from_iter overflow"`).
 #[derive(Clone, Debug)]
 pub struct Vec<T, const N: usize>(Inner<T, N>);
 
@@ -34,11 +37,8 @@ impl<T, const N: usize> Vec<T, N> {
     {
         #[cfg(feature = "alloc")]
         {
-            // Optimized: check length upfront, allocate with exact capacity
             if other.len() > N {
-                return Err(Error::Validation(
-                    crate::error::Error::MAX_NAME_SIZE_EXCEEDED,
-                ));
+                return Err(Error::CapacityExceeded);
             }
             let mut v = Self(Inner::with_capacity(other.len()));
             v.0.extend_from_slice(other);
@@ -90,18 +90,13 @@ impl<T, const N: usize> Vec<T, N> {
     {
         #[cfg(feature = "alloc")]
         {
-            // Optimized: single upfront capacity check
             let current_len = self.0.len();
             let new_len = current_len.saturating_add(other.len());
             if new_len > N {
-                return Err(Error::Validation(
-                    crate::error::Error::MAX_NAME_SIZE_EXCEEDED,
-                ));
+                return Err(Error::CapacityExceeded);
             }
-            // Reserve exact capacity if needed (avoids reallocation and over-allocation)
             let current_cap = self.0.capacity();
             if current_cap < new_len {
-                // Reserve exactly what we need (new_len - current_cap additional capacity)
                 self.0.reserve_exact(new_len - current_cap);
             }
             self.0.extend_from_slice(other);
@@ -111,7 +106,7 @@ impl<T, const N: usize> Vec<T, N> {
         {
             self.0
                 .extend_from_slice(other)
-                .map_err(|_| Error::Validation(crate::error::Error::MAX_NAME_SIZE_EXCEEDED))
+                .map_err(|_| Error::CapacityExceeded)
         }
     }
 
@@ -120,20 +115,15 @@ impl<T, const N: usize> Vec<T, N> {
     pub fn push(&mut self, item: T) -> Result<()> {
         #[cfg(feature = "alloc")]
         {
-            // Optimized: check length before pushing (avoids capacity check in alloc Vec)
             if self.0.len() >= N {
-                return Err(Error::Validation(
-                    crate::error::Error::MAX_NAME_SIZE_EXCEEDED,
-                ));
+                return Err(Error::CapacityExceeded);
             }
             self.0.push(item);
             Ok(())
         }
         #[cfg(not(feature = "alloc"))]
         {
-            self.0
-                .push(item)
-                .map_err(|_| Error::Validation(crate::error::Error::MAX_NAME_SIZE_EXCEEDED))
+            self.0.push(item).map_err(|_| Error::CapacityExceeded)
         }
     }
 
@@ -203,11 +193,18 @@ impl<T, const N: usize> FromIterator<T> for Vec<T, N> {
         #[cfg(feature = "alloc")]
         {
             let iter = iter.into_iter();
-            // Optimized: get size hint once
             let (lower, upper) = iter.size_hint();
-            let capacity = upper.unwrap_or(lower).min(N);
-            let mut v = alloc::vec::Vec::with_capacity(capacity);
-            v.extend(iter);
+            let reserve = upper.unwrap_or(lower).min(N);
+            let mut v = alloc::vec::Vec::new();
+            if reserve > 0 {
+                v.reserve_exact(reserve);
+            }
+            for item in iter {
+                if v.len() >= N {
+                    panic!("Vec::from_iter overflow");
+                }
+                v.push(item);
+            }
             Self(v)
         }
         #[cfg(not(feature = "alloc"))]
@@ -268,5 +265,38 @@ impl<T, const N: usize> core::ops::Deref for Vec<T, N> {
     #[inline]
     fn deref(&self) -> &Self::Target {
         self.as_slice()
+    }
+}
+
+#[cfg(all(test, feature = "alloc"))]
+mod from_iter_tests {
+    use super::Vec;
+
+    #[test]
+    fn from_iter_collects_up_to_n() {
+        let v: Vec<u8, 4> = [1, 2, 3, 4].into_iter().collect();
+        assert_eq!(v.as_slice(), [1, 2, 3, 4]);
+    }
+
+    #[test]
+    #[should_panic(expected = "Vec::from_iter overflow")]
+    fn from_iter_panics_when_more_than_n() {
+        let _: Vec<u8, 2> = [1_u8, 2, 3].into_iter().collect();
+    }
+
+    #[test]
+    #[should_panic(expected = "Vec::from_iter overflow")]
+    fn from_iter_panics_despite_lying_upper_hint() {
+        struct BadHint<I>(I);
+        impl<I: Iterator<Item = u8>> Iterator for BadHint<I> {
+            type Item = u8;
+            fn next(&mut self) -> Option<Self::Item> {
+                self.0.next()
+            }
+            fn size_hint(&self) -> (usize, Option<usize>) {
+                (0, Some(1))
+            }
+        }
+        let _: Vec<u8, 2> = BadHint([1_u8, 2, 3].into_iter()).collect();
     }
 }

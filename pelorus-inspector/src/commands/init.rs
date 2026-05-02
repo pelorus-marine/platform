@@ -10,6 +10,7 @@ use tauri::State;
 pub struct InitialFilesResponse {
     pub dbc_path: Option<String>,
     pub mdf4_path: Option<String>,
+    pub vss_path: Option<String>,
 }
 
 /// Get initial files specified via command line arguments.
@@ -27,9 +28,11 @@ pub async fn get_initial_files(
         .mdf4_path
         .clone()
         .or_else(|| session.mdf4_path.clone());
+    let vss_path = files.vss_path.clone().or_else(|| session.vss_path.clone());
 
     Ok(InitialFilesResponse {
         dbc_path,
         mdf4_path,
+        vss_path,
     })
 }

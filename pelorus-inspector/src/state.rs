@@ -1,6 +1,7 @@
 //! Application state management.
 
 use crate::config::SessionConfig;
+use crate::vss::{VssCatalog, VssMatchIndex};
 use dbc_rs::{Dbc, FastDbc};
 use parking_lot::Mutex;
 
@@ -12,6 +13,7 @@ use tokio::sync::oneshot;
 pub struct InitialFiles {
     pub dbc_path: Option<String>,
     pub mdf4_path: Option<String>,
+    pub vss_path: Option<String>,
 }
 
 /// Type alias for the stop channel sender.
@@ -30,6 +32,15 @@ pub struct AppState {
 
     /// Path to the currently loaded DBC file.
     pub dbc_path: Mutex<Option<String>>,
+
+    /// Path to the currently loaded VSS (.vspec) catalog file.
+    pub vss_path: Mutex<Option<String>>,
+
+    /// Parsed VSS catalog (Pelorus `Vessel.*` tree).
+    pub vss_catalog: Mutex<Option<VssCatalog>>,
+
+    /// Precomputed leaf-name lookup for decoded CAN signals.
+    pub vss_match: Mutex<Option<VssMatchIndex>>,
 
     /// Initial files from command line.
     pub initial_files: Mutex<InitialFiles>,
@@ -53,6 +64,9 @@ impl AppState {
             dbc: Mutex::new(None),
             fast_dbc: Mutex::new(None),
             dbc_path: Mutex::new(None),
+            vss_path: Mutex::new(None),
+            vss_catalog: Mutex::new(None),
+            vss_match: Mutex::new(None),
             initial_files: Mutex::new(initial_files),
             session: Mutex::new(session),
             #[cfg(target_os = "linux")]
@@ -75,6 +89,19 @@ impl AppState {
         *self.dbc.lock() = None;
         *self.fast_dbc.lock() = None;
     }
+
+    /// Clear the loaded VSS catalog and match index.
+    pub fn clear_vss_catalog(&self) {
+        *self.vss_catalog.lock() = None;
+        *self.vss_match.lock() = None;
+    }
+
+    /// Set parsed VSS catalog and refresh the match index used during CAN decode.
+    pub fn set_vss_catalog(&self, catalog: Option<VssCatalog>) {
+        let idx = catalog.as_ref().map(VssCatalog::match_index);
+        *self.vss_match.lock() = idx;
+        *self.vss_catalog.lock() = catalog;
+    }
 }
 
 impl Default for AppState {
@@ -84,6 +111,9 @@ impl Default for AppState {
             dbc: Mutex::new(None),
             fast_dbc: Mutex::new(None),
             dbc_path: Mutex::new(None),
+            vss_path: Mutex::new(None),
+            vss_catalog: Mutex::new(None),
+            vss_match: Mutex::new(None),
             initial_files: Mutex::new(InitialFiles::default()),
             session: Mutex::new(session),
             #[cfg(target_os = "linux")]

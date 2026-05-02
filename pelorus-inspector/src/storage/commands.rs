@@ -12,8 +12,9 @@ pub fn storage_list(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<Vec<ArtifactMeta>, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
     state.list(atype)
 }
 
@@ -24,8 +25,9 @@ pub fn storage_get(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<Option<Vec<u8>>, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
     state.get_content(&name, atype)
 }
 
@@ -37,8 +39,9 @@ pub fn storage_import(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<ArtifactMeta, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     let content =
         std::fs::read(&path).map_err(|e| format!("Failed to read file '{}': {}", path, e))?;
@@ -54,8 +57,9 @@ pub fn storage_store(
     content: Vec<u8>,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<ArtifactMeta, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     state.store(&name, atype, &content)
 }
@@ -68,8 +72,9 @@ pub fn storage_export(
     path: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<(), String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     let content = state
         .get_content(&name, atype)?
@@ -85,8 +90,9 @@ pub fn storage_delete(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<bool, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     state.delete(&name, atype)
 }
@@ -99,8 +105,9 @@ pub fn storage_rename(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<ArtifactMeta, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     state.rename(&old_name, &new_name, atype)
 }
@@ -112,8 +119,9 @@ pub fn storage_exists(
     artifact_type: String,
     state: State<'_, Arc<StorageState>>,
 ) -> Result<bool, String> {
-    let atype = ArtifactType::from_str(&artifact_type)
-        .ok_or_else(|| format!("Invalid artifact type: {}", artifact_type))?;
+    let atype = artifact_type
+        .parse::<ArtifactType>()
+        .map_err(|_| format!("Invalid artifact type: {}", artifact_type))?;
 
     state.exists(&name, atype)
 }

@@ -10,6 +10,7 @@ describe('config', () => {
   describe('defaultConfig', () => {
     it('should have all required properties', () => {
       expect(defaultConfig.showDbcTab).toBe(true);
+      expect(defaultConfig.showVssTab).toBe(true);
       expect(defaultConfig.showLiveTab).toBe(true);
       expect(defaultConfig.showMdf4Tab).toBe(true);
       expect(defaultConfig.initialTab).toBe('dbc');

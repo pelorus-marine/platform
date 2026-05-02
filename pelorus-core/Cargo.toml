@@ -19,6 +19,7 @@ std = ["dbc-rs?/std", "mdf4-rs?/std"]
 semantics = []
 alloc = ["dbc-rs?/alloc"]
 canbus = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/alloc"]
+canbus_heapless = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/heapless"]
 vdr = ["dep:mdf4-rs", "dep:dbc-rs", "std", "mdf4-rs/std", "mdf4-rs/dbc", "dbc-rs/std"]
 hw_test = []
 

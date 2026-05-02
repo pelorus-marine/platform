@@ -32,6 +32,7 @@ export function createStore<T extends object>(initialState: T) {
 /** Global file + decode context */
 export interface AppState {
   dbcFile: string | null;
+  vssFile: string | null;
   mdf4File: string | null;
   mdf4Frames: CanFrame[];
   mdf4Signals: DecodedSignal[];
@@ -39,6 +40,7 @@ export interface AppState {
 
 export const appStore = createStore<AppState>({
   dbcFile: null,
+  vssFile: null,
   mdf4File: null,
   mdf4Frames: [],
   mdf4Signals: [],

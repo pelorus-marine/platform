@@ -2,14 +2,15 @@
  * Pelorus Inspector Shell
  *
  * Thin orchestration layer that:
- * - Routes between MDF4 Inspector, Live Viewer, DBC Editor, and About tabs
+ * - Routes between MDF4 Inspector, Live Viewer, DBC / VSS editors, and About tabs
  * - Manages shared DBC state across components
  * - Handles initial file loading from CLI args
  */
 
+import { listen } from './ipc.js';
 import type { InspectorApi, InspectorConfig, DbcInfo, InspectorExtension } from './types';
 import { extractFilename } from './utils';
-import { events, emitDbcChanged, type TabSwitchEvent } from './events';
+import { events, emitDbcChanged, emitVssChanged, type TabSwitchEvent, type VssChangedEvent } from './events';
 import { appStore, pelorusWorkspace } from './store';
 import { defaultConfig } from './config';
 import { mapDbcInfoToDto, createEmptyDbcDto } from './dbc-mapping';
@@ -24,10 +25,12 @@ import styles from '../styles/pelorus-inspector.css?inline';
 import './components/mdf4-inspector';
 import './components/live-viewer';
 import './components/dbc-editor';
+import './components/vss-editor/vss-editor';
 
 import type { Mdf4InspectorElement, Mdf4InspectorApi } from './components/mdf4-inspector';
 import type { LiveViewerElement, LiveViewerApi } from './components/live-viewer';
 import type { DbcEditorComponent, DbcEditorApi } from './components/dbc-editor';
+import type { VssEditorElement, VssEditorApi } from './components/vss-editor/vss-editor';
 import { exportDbcToString } from './components/dbc-editor';
 
 /** localStorage key for persisting active tab */
@@ -51,6 +54,7 @@ export class PelorusInspectorElement extends HTMLElement {
   private mdf4Inspector: Mdf4InspectorElement | null = null;
   private liveViewer: LiveViewerElement | null = null;
   private dbcEditor: DbcEditorComponent | null = null;
+  private vssEditor: VssEditorElement | null = null;
 
   // Lab / extension panels (CAN, simulator, decoder, workflow, storage)
   private extensions = new Map<string, { ext: InspectorExtension; disabled: boolean }>();
@@ -59,6 +63,8 @@ export class PelorusInspectorElement extends HTMLElement {
   // Bound handlers for cleanup
   private boundBeforeUnload = this.handleBeforeUnload.bind(this);
   private handleTabSwitch = (e: TabSwitchEvent) => this.switchTab(e.tab);
+  /** Unsubscribe Tauri → mitt bridge for `vss-changed` */
+  private unlistenVssBackend: (() => void) | null = null;
 
   constructor() {
     super();
@@ -76,7 +82,21 @@ export class PelorusInspectorElement extends HTMLElement {
   setApi(api: InspectorApi): void {
     this.api = api;
     this.setupComponents();
+    void this.attachVssBackendBridge();
     this.loadInitialFiles();
+  }
+
+  /** Forward Rust `vss-changed` events to the mitt bus (same shape as `VssChangedEvent`). */
+  private async attachVssBackendBridge(): Promise<void> {
+    this.unlistenVssBackend?.();
+    this.unlistenVssBackend = null;
+    try {
+      this.unlistenVssBackend = await listen('vss-changed', ev => {
+        emitVssChanged(ev.payload as VssChangedEvent);
+      });
+    } catch {
+      /* Browser / tests without Tauri */
+    }
   }
 
   setConfig(config: Partial<InspectorConfig>): void {
@@ -154,12 +174,17 @@ export class PelorusInspectorElement extends HTMLElement {
   disconnectedCallback(): void {
     window.removeEventListener('beforeunload', this.boundBeforeUnload);
     events.off('tab:switch', this.handleTabSwitch);
+    this.unlistenVssBackend?.();
+    this.unlistenVssBackend = null;
   }
 
   private handleBeforeUnload(e: BeforeUnloadEvent): void {
-    if (this.dbcEditor?.getIsDirty()) {
+    const dirty: string[] = [];
+    if (this.dbcEditor?.getIsDirty()) dirty.push('DBC');
+    if (this.vssEditor?.getIsDirty()) dirty.push('VSS catalog');
+    if (dirty.length > 0) {
       e.preventDefault();
-      e.returnValue = 'You have unsaved DBC changes. Are you sure you want to leave?';
+      e.returnValue = `You have unsaved changes (${dirty.join(', ')}). Leave anyway?`;
     }
   }
 
@@ -216,6 +241,7 @@ export class PelorusInspectorElement extends HTMLElement {
           </div>
           <nav class="cv-tabs bordered">
             ${this.config.showDbcTab ? '<button class="cv-tab" data-tab="dbc" title="View and manage DBC files">DBC</button>' : ''}
+            ${this.config.showVssTab ? '<button class="cv-tab" data-tab="vss" title="Pelorus VSS catalog (.vspec)">VSS</button>' : ''}
             ${this.config.showMdf4Tab ? '<button class="cv-tab" data-tab="mdf4" title="Load MDF4 measurement files">MDF4</button>' : ''}
             ${this.config.showLiveTab ? '<button class="cv-tab" data-tab="live" title="Capture from SocketCAN">Live</button>' : ''}
             ${extensionTabs}
@@ -224,6 +250,7 @@ export class PelorusInspectorElement extends HTMLElement {
           <cv-mdf4-toolbar></cv-mdf4-toolbar>
           <cv-live-toolbar></cv-live-toolbar>
           <cv-dbc-toolbar></cv-dbc-toolbar>
+          ${this.config.showVssTab ? '<cv-vss-toolbar></cv-vss-toolbar>' : ''}
           ${extensionToolbars}
           <div id="aboutTab" class="cv-toolbar cv-tab-pane cv-about-header">
             <span class="cv-about-title">${this.config.appName}</span>
@@ -234,6 +261,7 @@ export class PelorusInspectorElement extends HTMLElement {
         <cv-mdf4-inspector class="cv-panel hidden" id="mdf4Panel"></cv-mdf4-inspector>
         <cv-live-viewer class="cv-panel hidden" id="livePanel"></cv-live-viewer>
         <cv-dbc-editor class="cv-panel hidden" id="dbcPanel"></cv-dbc-editor>
+        ${this.config.showVssTab ? '<cv-vss-editor class="cv-panel hidden" id="vssPanel"></cv-vss-editor>' : ''}
         ${extensionPanels}
         ${this.generateAboutPanel()}
       </div>
@@ -264,6 +292,7 @@ export class PelorusInspectorElement extends HTMLElement {
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Live SocketCAN Capture</span></div><p class="cv-card-body">Lossless capture from Linux SocketCAN with real-time MDF4 recording and live monitors.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">DBC Signal Decoding</span></div><p class="cv-card-body">Decode raw CAN frames into physical values. Supports CAN 2.0 and CAN FD with extended IDs.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Built-in DBC Editor</span></div><p class="cv-card-body">Create and modify DBC files directly. Edit messages, signals, and their properties.</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">VSS Signal Catalog</span></div><p class="cv-card-body">Edit Pelorus <code>Vessel.*</code> catalogs (COVESA VSS syntax). Decode view shows semantic paths next to DBC signals.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Real-time Monitors</span></div><p class="cv-card-body">Message monitor shows latest data per CAN ID. Signal monitor groups decoded values by message.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">High Performance</span></div><p class="cv-card-body">Rust backend handles all processing. Pre-rendered updates minimize frontend overhead.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">SocketCAN Lab</span></div><p class="cv-card-body">Create vcan/slcan interfaces, tune bit timing, and bridge buses with gateway helpers (where the OS allows).</p></div>
@@ -275,7 +304,7 @@ export class PelorusInspectorElement extends HTMLElement {
         </div>
         <div class="cv-tab-pane" id="aboutAcknowledgments">
           <div class="cv-grid responsive">
-            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Standards</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://www.asam.net/standards/detail/mdf/" target="_blank">ASAM MDF4</a> – Measurement data format</li><li><a href="https://docs.kernel.org/networking/can.html" target="_blank">SocketCAN</a> – Linux CAN subsystem</li><li><a href="https://www.iso.org/standard/63648.html" target="_blank">ISO 11898</a> – CAN protocol spec</li></ul></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Standards</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://www.asam.net/standards/detail/mdf/" target="_blank">ASAM MDF4</a> – Measurement data format</li><li><a href="https://covesa.github.io/vehicle_signal_specification/" target="_blank">COVESA VSS</a> – Vehicle Signal Specification</li><li><a href="https://docs.kernel.org/networking/can.html" target="_blank">SocketCAN</a> – Linux CAN subsystem</li><li><a href="https://www.iso.org/standard/63648.html" target="_blank">ISO 11898</a> – CAN protocol spec</li></ul></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rust Core</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://tauri.app" target="_blank">Tauri</a> – Desktop app framework</li><li class="cv-sister-project"><a href="https://crates.io/crates/mdf4-rs" target="_blank">mdf4-rs</a> – MDF4 parser/writer</li><li class="cv-sister-project"><a href="https://crates.io/crates/dbc-rs" target="_blank">dbc-rs</a> – DBC parser/decoder</li><li><a href="https://crates.io/crates/socketcan" target="_blank">socketcan</a> – CAN FD bindings</li></ul></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rust Ecosystem</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://tokio.rs" target="_blank">Tokio</a> – Async runtime</li><li><a href="https://serde.rs" target="_blank">Serde</a> – Serialization</li><li><a href="https://clap.rs" target="_blank">Clap</a> – CLI parser</li><li><a href="https://rhai.rs" target="_blank">Rhai</a> – Embedded scripting</li><li><a href="https://crates.io/crates/rusqlite" target="_blank">rusqlite</a> – SQLite</li><li><a href="https://crates.io/crates/zip" target="_blank">zip</a> – Archives</li></ul></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Frontend</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://vite.dev" target="_blank">Vite</a> – Build tool</li><li><a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> – Typed JavaScript</li><li><a href="https://vitest.dev" target="_blank">Vitest</a> – Test framework</li></ul></div>
@@ -291,6 +320,7 @@ export class PelorusInspectorElement extends HTMLElement {
     this.mdf4Inspector = this.shadow.querySelector('cv-mdf4-inspector');
     this.liveViewer = this.shadow.querySelector('cv-live-viewer');
     this.dbcEditor = this.shadow.querySelector('cv-dbc-editor');
+    this.vssEditor = this.shadow.querySelector('cv-vss-editor');
   }
 
   private bindEvents(): void {
@@ -326,6 +356,13 @@ export class PelorusInspectorElement extends HTMLElement {
     this.shadow.querySelector('cv-dbc-toolbar')?.addEventListener('cancel', () => this.dbcEditor?.cancelEdit());
     this.shadow.querySelector('cv-dbc-toolbar')?.addEventListener('save', () => this.dbcEditor?.handleSave());
     this.shadow.querySelector('cv-dbc-toolbar')?.addEventListener('save-as', () => this.dbcEditor?.handleSaveAs());
+
+    // VSS toolbar events
+    this.shadow.querySelector('cv-vss-toolbar')?.addEventListener('new', () => this.vssEditor?.handleNew());
+    this.shadow.querySelector('cv-vss-toolbar')?.addEventListener('open', () => this.vssEditor?.handleOpen());
+    this.shadow.querySelector('cv-vss-toolbar')?.addEventListener('clear', () => void this.vssEditor?.handleClearCatalog());
+    this.shadow.querySelector('cv-vss-toolbar')?.addEventListener('save', () => this.vssEditor?.handleSave());
+    this.shadow.querySelector('cv-vss-toolbar')?.addEventListener('save-as', () => this.vssEditor?.handleSaveAs());
 
     // About panel tabs
     this.shadow.querySelector('#aboutPanel')?.querySelectorAll('.cv-tab').forEach(tab => {
@@ -374,6 +411,28 @@ export class PelorusInspectorElement extends HTMLElement {
     if (this.dbcEditor) {
       this.dbcEditor.setApi(this.createDbcEditorApi());
     }
+
+    // Setup VSS Editor
+    if (this.vssEditor) {
+      this.vssEditor.setApi(this.createVssEditorApi());
+    }
+  }
+
+  private createVssEditorApi(): VssEditorApi {
+    const api = this.api!;
+    return {
+      loadVss: (path) => api.loadVss(path),
+      saveVssContent: (path, content) => api.saveVssContent(path, content),
+      clearVss: (emitChanged?) => api.clearVss(emitChanged),
+      updateVssContent: (content) => api.updateVssContent(content),
+      updateVssCatalog: (dto) => api.updateVssCatalog(dto),
+      serializeVssCatalog: (dto) => api.serializeVssCatalog(dto),
+      getVssSnapshot: () => api.getVssSnapshot(),
+      getVssPath: () => api.getVssPath(),
+      openFileDialog: () =>
+        api.openFileDialog([{ name: 'VSS catalog', extensions: ['vspec', 'yaml', 'yml'] }]),
+      saveFileDialog: (filters, defaultName) => api.saveFileDialog(filters, defaultName),
+    };
   }
 
   private createMdf4Api(): Mdf4InspectorApi {
@@ -480,6 +539,14 @@ export class PelorusInspectorElement extends HTMLElement {
       }
     }
 
+    if (this.state.activeTab === 'vss' && tab !== 'vss') {
+      if (this.vssEditor?.hasUnsavedChanges()) {
+        if (!confirm('You have unsaved changes in the VSS catalog editor. Leave anyway?')) {
+          return;
+        }
+      }
+    }
+
     this.state.activeTab = tab;
     localStorage.setItem(STORAGE_KEY_TAB, tab);
 
@@ -497,11 +564,13 @@ export class PelorusInspectorElement extends HTMLElement {
     const mdf4Panel = this.shadow.querySelector('#mdf4Panel');
     const livePanel = this.shadow.querySelector('#livePanel');
     const dbcPanel = this.shadow.querySelector('#dbcPanel');
+    const vssPanel = this.shadow.querySelector('#vssPanel');
     const aboutPanel = this.shadow.querySelector('#aboutPanel');
 
     mdf4Panel?.classList.toggle('hidden', tab !== 'mdf4');
     livePanel?.classList.toggle('hidden', tab !== 'live');
     dbcPanel?.classList.toggle('hidden', tab !== 'dbc');
+    vssPanel?.classList.toggle('hidden', tab !== 'vss');
     aboutPanel?.classList.toggle('hidden', tab !== 'about');
 
     // Show/hide extension panels
@@ -530,6 +599,9 @@ export class PelorusInspectorElement extends HTMLElement {
       if (initial.mdf4_path && this.mdf4Inspector) {
         await this.mdf4Inspector.loadFile(initial.mdf4_path);
         this.switchTab('mdf4');
+      }
+      if (initial.vss_path && this.vssEditor && this.config.showVssTab) {
+        await this.vssEditor.loadFile(initial.vss_path);
       }
     } catch (err) {
       console.error('Failed to load initial files:', err);

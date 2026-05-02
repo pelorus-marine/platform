@@ -8,6 +8,8 @@ import type {
   FileFilter,
   LiveCaptureUpdate,
   StatsHtml,
+  VssSnapshotDto,
+  VssCatalogDto,
 } from '../types';
 
 /** Mock API implementation for testing */
@@ -114,7 +116,46 @@ export class MockApi implements InspectorApi {
   }
 
   async getInitialFiles(): Promise<InitialFiles> {
-    return { dbc_path: null, mdf4_path: null };
+    return { dbc_path: null, mdf4_path: null, vss_path: null };
+  }
+
+  async loadVss(_path: string): Promise<VssSnapshotDto> {
+    return { roots: [], leaves: [], branch_count: 0, leaf_count: 0 };
+  }
+
+  async clearVss(emitChanged = true): Promise<void> {
+    if (emitChanged) {
+      const { emitVssChanged } = await import('../events');
+      emitVssChanged({ action: 'cleared', snapshot: null, filename: null });
+    }
+  }
+
+  async getVssPath(): Promise<string | null> {
+    return null;
+  }
+
+  async getVssSnapshot(): Promise<VssSnapshotDto | null> {
+    return null;
+  }
+
+  async saveVssContent(_path: string, _content: string): Promise<void> {}
+
+  async updateVssContent(_content: string): Promise<string> {
+    return 'Updated VSS';
+  }
+
+  async updateVssCatalog(dto: VssCatalogDto): Promise<VssSnapshotDto> {
+    return {
+      roots: dto.roots,
+      leaves: [],
+      branch_count: dto.roots.length,
+      leaf_count: 0,
+    };
+  }
+
+  async serializeVssCatalog(dto: VssCatalogDto): Promise<string> {
+    void dto;
+    return 'Vessel:\n  type: branch\n';
   }
 
   async saveDbcContent(_path: string, _content: string): Promise<void> {

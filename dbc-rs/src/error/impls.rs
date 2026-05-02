@@ -324,6 +324,19 @@ impl From<core::num::ParseIntError> for Error {
 #[cfg(feature = "std")]
 impl std::error::Error for Error {}
 
+impl From<pelorus_bounded::Error> for Error {
+    #[inline]
+    fn from(e: pelorus_bounded::Error) -> Self {
+        match e {
+            pelorus_bounded::Error::CapacityExceeded => {
+                Self::Validation(Self::MAX_NAME_SIZE_EXCEEDED)
+            }
+            pelorus_bounded::Error::InvalidUtf8 => Self::expected(Self::INVALID_UTF8),
+            _ => Self::Validation(Self::MAX_NAME_SIZE_EXCEEDED),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(clippy::float_cmp)]

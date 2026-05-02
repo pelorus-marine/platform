@@ -1,7 +1,7 @@
 import type { CanFrame, DecodedSignal } from '../../types';
 import { formatSignalValue } from '../../utils';
 import { escapeHtml } from '../../utils/html';
-import { events, type FrameSelectedEvent, type DbcChangedEvent } from '../../events';
+import { events, type FrameSelectedEvent, type DbcChangedEvent, type VssChangedEvent } from '../../events';
 
 /** API interface for signals panel (fallback decoding) */
 export interface SignalsPanelApi {
@@ -17,6 +17,7 @@ export class SignalsPanelElement extends HTMLElement {
 
   private handleFrameSelected = (event: FrameSelectedEvent) => this.onFrameSelected(event);
   private handleDbcChanged = (event: DbcChangedEvent) => this.onDbcChanged(event);
+  private handleVssChanged = (_event: VssChangedEvent) => this.onVssChanged();
 
   constructor() {
     super();
@@ -25,11 +26,13 @@ export class SignalsPanelElement extends HTMLElement {
   connectedCallback(): void {
     events.on('frame:selected', this.handleFrameSelected);
     events.on('dbc:changed', this.handleDbcChanged);
+    events.on('vss:changed', this.handleVssChanged);
   }
 
   disconnectedCallback(): void {
     events.off('frame:selected', this.handleFrameSelected);
     events.off('dbc:changed', this.handleDbcChanged);
+    events.off('vss:changed', this.handleVssChanged);
   }
 
   /** Set the API for fallback decoding (when DBC loaded after MDF4) */
@@ -60,6 +63,12 @@ export class SignalsPanelElement extends HTMLElement {
       return;
     }
     // DBC loaded/updated - re-decode current frame via API
+    if (this.currentFrame) {
+      await this.decodeCurrentFrame();
+    }
+  }
+
+  private async onVssChanged(): Promise<void> {
     if (this.currentFrame) {
       await this.decodeCurrentFrame();
     }
@@ -103,7 +112,7 @@ export class SignalsPanelElement extends HTMLElement {
     const errorContainer = this.querySelector('.cv-decode-error');
 
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="3" class="cv-signals-empty">Select a frame to view decoded signals</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" class="cv-signals-empty">Select a frame to view decoded signals</td></tr>';
     }
     if (count) {
       count.textContent = 'Select a frame';
@@ -127,18 +136,22 @@ export class SignalsPanelElement extends HTMLElement {
 
     if (tbody) {
       if (this.signals.length === 0 && this.errors.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3" class="cv-signals-empty">No signals decoded</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" class="cv-signals-empty">No signals decoded</td></tr>';
       } else {
         tbody.innerHTML = this.signals.map(sig => {
           // If there's a value description, show it prominently with numeric value secondary
           const valueDisplay = sig.description
             ? `<span class="cv-value-desc">${escapeHtml(sig.description)}</span> <span class="cv-value-num">(${formatSignalValue(sig.value)})</span>`
             : formatSignalValue(sig.value);
+          const vessel = sig.vessel_path
+            ? `<span class="cv-vessel-path" title="Pelorus VSS">${escapeHtml(sig.vessel_path)}</span>`
+            : '<span class="cv-muted">—</span>';
           return `
             <tr>
               <td class="cv-signal-name">${escapeHtml(sig.signal_name)}</td>
               <td class="cv-physical-value">${valueDisplay}</td>
               <td class="cv-unit-highlight">${sig.unit || '-'}</td>
+              <td class="cv-vessel-cell">${vessel}</td>
             </tr>
           `;
         }).join('');

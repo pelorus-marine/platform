@@ -1,18 +1,20 @@
 //! Tauri command handlers.
 
-mod capture;
 mod capabilities;
+mod capture;
 mod dbc;
 pub mod filter;
 mod init;
 pub mod mdf;
+mod vss;
 
-pub use capture::*;
 pub use capabilities::*;
+pub use capture::*;
 pub use dbc::*;
 pub use filter::*;
 pub use init::*;
 pub use mdf::*;
+pub use vss::*;
 
 /// Invoke handler for Pelorus Inspector.
 #[macro_export]
@@ -28,6 +30,14 @@ macro_rules! base_commands {
             pelorus_inspector::commands::decode_frames,
             pelorus_inspector::commands::get_dbc_info,
             pelorus_inspector::commands::get_dbc_specification,
+            pelorus_inspector::commands::load_vss,
+            pelorus_inspector::commands::clear_vss,
+            pelorus_inspector::commands::get_vss_path,
+            pelorus_inspector::commands::get_vss_snapshot,
+            pelorus_inspector::commands::save_vss_content,
+            pelorus_inspector::commands::update_vss_content,
+            pelorus_inspector::commands::update_vss_catalog,
+            pelorus_inspector::commands::serialize_vss_catalog,
             pelorus_inspector::commands::load_mdf4,
             pelorus_inspector::commands::export_logs,
             pelorus_inspector::commands::list_can_interfaces,

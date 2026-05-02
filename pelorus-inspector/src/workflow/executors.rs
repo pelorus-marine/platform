@@ -158,6 +158,12 @@ impl FilterIdExecutor {
     }
 }
 
+impl Default for FilterIdExecutor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NodeExecutor for FilterIdExecutor {
     fn execute(&mut self, inputs: &[PortData], ctx: &mut ExecutionContext) -> NodeOutputs {
         self.update_config(ctx.config);
@@ -245,6 +251,12 @@ impl FilterDataExecutor {
             self.cached_mask_str = mask_str.to_string();
             self.mask = Self::parse_hex_bytes(mask_str);
         }
+    }
+}
+
+impl Default for FilterDataExecutor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -345,6 +357,12 @@ impl FilterSignalNameExecutor {
     }
 }
 
+impl Default for FilterSignalNameExecutor {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NodeExecutor for FilterSignalNameExecutor {
     fn execute(&mut self, inputs: &[PortData], ctx: &mut ExecutionContext) -> NodeOutputs {
         self.update_config(ctx.config);
@@ -389,6 +407,7 @@ impl NodeExecutor for FilterSignalNameExecutor {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Filter signals by comparing value
+#[derive(Default)]
 pub struct FilterSignalValueExecutor;
 
 impl FilterSignalValueExecutor {
@@ -475,6 +494,12 @@ impl DecodeExecutor {
         Self {
             blacklist: std::collections::HashSet::new(),
         }
+    }
+}
+
+impl Default for DecodeExecutor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -565,6 +590,12 @@ impl EncodeExecutor {
         Self {
             blacklist: std::collections::HashSet::new(),
         }
+    }
+}
+
+impl Default for EncodeExecutor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -659,6 +690,7 @@ impl NodeExecutor for EncodeExecutor {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /// Compare value against threshold
+#[derive(Default)]
 pub struct ThresholdExecutor;
 
 impl ThresholdExecutor {
@@ -751,6 +783,12 @@ impl CounterExecutor {
             count: 0,
             last_reset: std::time::Instant::now(),
         }
+    }
+}
+
+impl Default for CounterExecutor {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

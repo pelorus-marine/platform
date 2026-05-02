@@ -8,7 +8,14 @@
 import type { CanFrame, DbcInfo, DecodedSignal, FileFilter } from '../../types';
 import type { FilterConfig } from '../../config';
 import { countActiveFilters, createEmptyFilterConfig, filterFrames } from '../../config';
-import { events, emitMdf4Changed, emitFrameSelected, type DbcChangedEvent, type CaptureStoppedEvent } from '../../events';
+import {
+  events,
+  emitMdf4Changed,
+  emitFrameSelected,
+  type DbcChangedEvent,
+  type CaptureStoppedEvent,
+  type VssChangedEvent,
+} from '../../events';
 import { appStore } from '../../store';
 import styles from '../../../styles/pelorus-inspector.css?inline';
 
@@ -64,6 +71,7 @@ export class Mdf4InspectorElement extends HTMLElement {
   // Bound event handlers for cleanup
   private handleDbcChanged = (event: DbcChangedEvent) => this.onDbcChanged(event);
   private handleCaptureStopped = (event: CaptureStoppedEvent) => this.onCaptureStopped(event);
+  private handleVssChanged = (_event: VssChangedEvent) => this.refreshDecodedSignals();
   private unsubscribeAppStore: (() => void) | null = null;
 
   constructor() {
@@ -76,12 +84,14 @@ export class Mdf4InspectorElement extends HTMLElement {
     this.render();
     events.on('dbc:changed', this.handleDbcChanged);
     events.on('capture:stopped', this.handleCaptureStopped);
+    events.on('vss:changed', this.handleVssChanged);
     this.unsubscribeAppStore = appStore.subscribe((state) => this.onAppStoreChange(state.mdf4File));
   }
 
   disconnectedCallback(): void {
     events.off('dbc:changed', this.handleDbcChanged);
     events.off('capture:stopped', this.handleCaptureStopped);
+    events.off('vss:changed', this.handleVssChanged);
     this.unsubscribeAppStore?.();
   }
 
@@ -149,6 +159,30 @@ export class Mdf4InspectorElement extends HTMLElement {
       this.signalsPanel?.clear();
     } catch (err) {
       console.error('Failed to reload MDF4:', err);
+    }
+  }
+
+  /** Re-run DBC + VSS decode on in-memory frames when the catalog changes. */
+  private async refreshDecodedSignals(): Promise<void> {
+    if (!this.api || this.state.frames.length === 0) return;
+    try {
+      const { signals, errors } = await this.api.decodeFrames(this.state.frames);
+      appStore.set({ mdf4Signals: signals });
+      const idx = this.state.selectedFrameIndex;
+      if (idx !== null && this.signalsPanel) {
+        const frame = this.state.filteredFrames[idx];
+        if (frame) {
+          const messageName = this.state.dbcInfo?.messages.find(m => m.id === frame.can_id)?.name;
+          const frameSignals = signals.filter(
+            s =>
+              s.timestamp === frame.timestamp &&
+              (!messageName || s.message_name === messageName),
+          );
+          this.signalsPanel.setSignals(frameSignals, errors);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to refresh decoded signals:', e);
     }
   }
 
@@ -264,6 +298,7 @@ export class Mdf4InspectorElement extends HTMLElement {
                     <th>Signal</th>
                     <th>Value</th>
                     <th>Unit</th>
+                    <th>Vessel (VSS)</th>
                   </tr>
                 </thead>
                 <tbody id="signalsTableBody"></tbody>

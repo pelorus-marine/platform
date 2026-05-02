@@ -2,9 +2,15 @@
 
 This document describes the internal architecture of the `dbc-rs` library.
 
+## Embedded-first
+
+Workspace policy: **[Embedded-first](../README.md#embedded-first)**.
+
+Implementation: **`pelorus-bounded`** supplies bounded **`Vec` / `String` / `BTreeMap`**; **`compat/`** re-exports and applies DBC **`MAX_*`** type aliases ([Compatibility Layer (`compat/`)](#compatibility-layer-compat)). **`alloc`** vs **`heapless`** is explicit via Cargo features; **`build.rs`** emits limits for firmware-scale parsing.
+
 ## Design Principles
 
-1. **`no_std` First** - The library is designed to work without the standard library, enabling use on embedded targets (Cortex-M, RISC-V, etc.)
+1. **`no_std` / Embedded-first alignment** — Parsing and decode paths stay usable without **`std`**; see [Embedded-first](#embedded-first) and bounded collections above.
 
 2. **Zero Unsafe Code** - The crate uses `#![forbid(unsafe_code)]` to guarantee memory safety at compile time
 
@@ -44,11 +50,9 @@ embedded-can ─────────────► Frame decoding (one dep:
 ```
 src/
 ├── lib.rs              # Crate root, public API exports
-├── compat/                 # Abstraction layer for alloc/heapless
-│   ├── mod.rs
-│   ├── string.rs           # String<N> wrapper
-│   └── vec.rs              # Vec<T, N> wrapper
-├── parser/                 # Hand-written zero-copy parser
+├── compat/             # Re-exports [`pelorus_bounded`] + DBC-specific aliases (`Name`, `validate_name`, …)
+│   └── mod.rs
+├── parser/             # Hand-written zero-copy parser
 │   ├── mod.rs              # Parser struct definition
 │   ├── impls.rs            # Core parsing methods
 │   ├── expect.rs           # Token expectation utilities
@@ -114,17 +118,17 @@ This pattern provides:
 
 ## Compatibility Layer (`compat/`)
 
-The compat module provides type aliases that abstract over `alloc` and `heapless`:
+Bounded **`Vec`**, **`String`**, and **`BTreeMap`** types come from workspace crate **`pelorus-bounded`** (features **`alloc`** vs **`heapless`**). The **`compat`** module re-exports those types and defines DBC-specific aliases (`Name`, `Comment`, `ValueDescEntries`, …) tied to generated limits (`MAX_NAME_SIZE`, …).
 
-```rust
-// With alloc feature:
-type Vec<T, const N: usize> = alloc::vec::Vec<T>;
-type String<const N: usize> = alloc::string::String;
+**`pelorus_bounded::Error`** maps into **`dbc_rs::Error`** via **`From`** so parser code can use `?` uniformly.
 
-// With heapless feature:
-type Vec<T, const N: usize> = heapless::Vec<T, N>;
-type String<const N: usize> = heapless::String<N>;
-```
+Roughly:
+
+- With **`alloc`**: wrappers enforce a maximum logical length **`N`** (including **`FromIterator`** on bounded **`Vec`**, matching **`heapless`** overflow semantics).
+- With **`heapless`**: the same API backs onto **`heapless`** collections (**`LinearMap`** stands in for **`BTreeMap`**; iteration order differs).
+
+- With **`alloc`**: wrappers enforce a maximum logical length **`N`** (including **`FromIterator`** on bounded **`Vec`**, matching **`heapless`** overflow semantics).
+- With **`heapless`**: the same API backs onto **`heapless`** collections (**`LinearMap`** stands in for **`BTreeMap`**; iteration order differs).
 
 **Key design decisions:**
 

@@ -3,8 +3,8 @@
 //! Backend execution of visual workflows for CAN data processing.
 //! Uses Tauri events for real-time status updates to the frontend.
 
+use crate::agent::ops::parse_can_dataframe;
 use crate::dto::CanFrameDto;
-use crate::commands::mdf::parse_can_dataframe;
 use std::sync::Arc;
 use tauri::{AppHandle, State};
 

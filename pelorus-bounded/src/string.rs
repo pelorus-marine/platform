@@ -5,8 +5,8 @@ extern crate alloc;
 
 use core::{fmt, hash, str};
 
-use crate::compat::vec::Vec;
 use crate::error::{Error, Result};
+use crate::vec::Vec;
 
 #[cfg(feature = "alloc")]
 type Inner<const N: usize> = alloc::string::String;
@@ -16,7 +16,7 @@ type Inner<const N: usize> = heapless::String<N>;
 /// A UTF-8–encoded, growable string.
 ///
 /// When `heapless` feature is enabled, this is wrapper around `heapless::String`. Otherwise, this
-/// is a wrapper around `alloc::string::String`, setting the initial capacity to `N`.
+/// is a wrapper around `alloc::string::String`, with logical length capped at `N` bytes.
 #[derive(Clone, Debug)]
 pub struct String<const N: usize>(Inner<N>);
 
@@ -32,16 +32,14 @@ impl<const N: usize> String<N> {
     pub fn from_utf8(vec: Vec<u8, N>) -> Result<Self> {
         #[cfg(feature = "alloc")]
         {
-            let utf8_str =
-                str::from_utf8(vec.as_slice()).map_err(|_| Error::expected(Error::INVALID_UTF8))?;
+            let utf8_str = str::from_utf8(vec.as_slice()).map_err(|_| Error::InvalidUtf8)?;
             Ok(Self(alloc::string::String::from(utf8_str)))
         }
         #[cfg(not(feature = "alloc"))]
         {
-            // heapless::String::from_utf8 takes ownership of Vec
             Inner::from_utf8(vec.into_inner())
                 .map(Self)
-                .map_err(|_| Error::expected(Error::INVALID_UTF8))
+                .map_err(|_| Error::InvalidUtf8)
         }
     }
 
@@ -76,12 +74,16 @@ impl<const N: usize> String<N> {
     pub fn push_str(&mut self, s: &str) -> Result<()> {
         #[cfg(feature = "alloc")]
         {
+            let new_len = self.0.len().saturating_add(s.len());
+            if new_len > N {
+                return Err(Error::CapacityExceeded);
+            }
             self.0.push_str(s);
             Ok(())
         }
         #[cfg(not(feature = "alloc"))]
         {
-            self.0.push_str(s).map_err(|_| Error::Validation(Error::MAX_NAME_SIZE_EXCEEDED))
+            self.0.push_str(s).map_err(|_| Error::CapacityExceeded)
         }
     }
 }
@@ -99,7 +101,7 @@ impl<'a, const N: usize> TryFrom<&'a str> for String<N> {
     #[inline]
     fn try_from(s: &'a str) -> Result<Self> {
         if s.len() > N {
-            return Err(Error::Validation(Error::MAX_NAME_SIZE_EXCEEDED));
+            return Err(Error::CapacityExceeded);
         }
         #[cfg(feature = "alloc")]
         {
@@ -109,7 +111,7 @@ impl<'a, const N: usize> TryFrom<&'a str> for String<N> {
         {
             Inner::try_from(s)
                 .map(Self)
-                .map_err(|_| Error::Validation(Error::MAX_NAME_SIZE_EXCEEDED))
+                .map_err(|_| Error::CapacityExceeded)
         }
     }
 }

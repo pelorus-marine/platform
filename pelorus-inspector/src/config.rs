@@ -9,6 +9,7 @@ use std::path::PathBuf;
 /// Embedded sample files for first run
 const SAMPLE_MF4: &[u8] = include_bytes!("../examples/sample.mf4");
 const SAMPLE_DBC: &[u8] = include_bytes!("../examples/sample.dbc");
+const SAMPLE_VSPEC: &[u8] = include_bytes!("../examples/sample.vspec");
 
 /// Session configuration that persists across app restarts.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -17,6 +18,9 @@ pub struct SessionConfig {
     pub dbc_path: Option<String>,
     /// Path to the last loaded MDF4 file.
     pub mdf4_path: Option<String>,
+    /// Path to the last loaded VSS (.vspec) catalog.
+    #[serde(default)]
+    pub vss_path: Option<String>,
     /// Whether first-run setup has been completed.
     #[serde(default)]
     pub setup_complete: bool,
@@ -50,6 +54,7 @@ impl SessionConfig {
 
                 let mf4_path = config_dir.join("sample.mf4");
                 let dbc_path = config_dir.join("sample.dbc");
+                let vspec_path = config_dir.join("sample.vspec");
 
                 // Extract sample files
                 if let Err(e) = fs::write(&mf4_path, SAMPLE_MF4) {
@@ -58,10 +63,14 @@ impl SessionConfig {
                 if let Err(e) = fs::write(&dbc_path, SAMPLE_DBC) {
                     log::warn!("Failed to extract sample DBC: {}", e);
                 }
+                if let Err(e) = fs::write(&vspec_path, SAMPLE_VSPEC) {
+                    log::warn!("Failed to extract sample VSPEC: {}", e);
+                }
 
                 // Set as defaults
                 config.mdf4_path = Some(mf4_path.to_string_lossy().into_owned());
                 config.dbc_path = Some(dbc_path.to_string_lossy().into_owned());
+                config.vss_path = Some(vspec_path.to_string_lossy().into_owned());
                 config.setup_complete = true;
                 if let Err(e) = config.save() {
                     log::warn!("Failed to save initial config: {}", e);
@@ -99,6 +108,12 @@ impl SessionConfig {
     /// Update MDF4 path and save.
     pub fn set_mdf4_path(&mut self, path: Option<String>) -> Result<(), String> {
         self.mdf4_path = path;
+        self.save()
+    }
+
+    /// Update VSS (.vspec) path and save.
+    pub fn set_vss_path(&mut self, path: Option<String>) -> Result<(), String> {
+        self.vss_path = path;
         self.save()
     }
 }

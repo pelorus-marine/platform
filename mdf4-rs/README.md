@@ -17,6 +17,12 @@ Crates.io releases are published from the **[`pelorus-marine/platform`](https://
 - **Full read/write** - Create, read, and modify MDF4 files
 - **CAN logging** - Integrated CAN bus data logging with DBC support
 
+## Embedded-first
+
+Workspace policy: **[Embedded-first](../README.md#embedded-first)**.
+
+Product placement: **`no_std` + `alloc`** readers with slim features; **`alloc`** for writers/loggers/`dbc` today—details and backlog in [`ARCHITECTURE.md`](ARCHITECTURE.md#bounded-heapless-writers-backlog).
+
 ## Quick Start
 
 ```toml
@@ -102,7 +108,7 @@ mdf4-rs requires **Rust 1.87.0** or later (**edition 2024**, first supported in 
 ## Documentation
 
 - [API Reference](https://docs.rs/mdf4-rs)
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Internal design
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Internal design (includes [Embedded-first](./ARCHITECTURE.md#embedded-first))
 
 ## License
 

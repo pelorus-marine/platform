@@ -15,6 +15,7 @@ categories = ["parsing", "embedded"]
 exclude = [".github/", "examples/", "tests/"]
 
 [dependencies]
+pelorus-bounded = { path = "../pelorus-bounded", default-features = false }
 
 [dependencies.heapless]
 version = "0.9.2"
@@ -29,8 +30,8 @@ features = ["std", "attributes"]
 
 [features]
 default = ["std", "attributes"]
-alloc = []
-heapless = ["dep:heapless"]
+alloc = ["pelorus-bounded/alloc"]
+heapless = ["dep:heapless", "pelorus-bounded/heapless"]
 std = ["alloc"]
 embedded-can = ["dep:embedded-can"]
 attributes = []

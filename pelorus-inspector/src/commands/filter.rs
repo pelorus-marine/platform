@@ -169,7 +169,7 @@ pub fn build_message_cache_from_dbc(dbc: &dbc_rs::Dbc) -> DbcMessageCache {
 }
 
 /// Build message info cache from AppState's DBC.
-fn build_message_cache(state: &AppState) -> DbcMessageCache {
+pub fn build_message_cache(state: &AppState) -> DbcMessageCache {
     let dbc_guard = state.dbc.lock();
     match *dbc_guard {
         Some(ref dbc) => build_message_cache_from_dbc(dbc),

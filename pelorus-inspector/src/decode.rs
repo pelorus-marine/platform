@@ -1,6 +1,7 @@
 //! CAN frame decoding using DBC definitions.
 
 use crate::dto::{CanFrameDto, DecodedSignalDto};
+use crate::vss::VssMatchIndex;
 use dbc_rs::Dbc;
 
 /// Result of decoding a frame - either signals or an error message.
@@ -10,7 +11,11 @@ pub enum DecodeResult {
 }
 
 /// Decode a CAN frame using dbc-rs, returning signals or an error.
-pub fn decode_frame(frame: &CanFrameDto, dbc: &Dbc) -> DecodeResult {
+pub fn decode_frame(
+    frame: &CanFrameDto,
+    dbc: &Dbc,
+    vss_match: Option<&VssMatchIndex>,
+) -> DecodeResult {
     let decoded = match dbc.decode(frame.can_id, &frame.data, frame.is_extended) {
         Ok(signals) => signals,
         Err(e) => {
@@ -40,7 +45,12 @@ pub fn decode_frame(frame: &CanFrameDto, dbc: &Dbc) -> DecodeResult {
     DecodeResult::Signals(
         decoded
             .iter()
-            .map(|sig| DecodedSignalDto::from_dbc_signal(sig, frame.timestamp, message_name))
+            .map(|sig| {
+                let vessel_path = vss_match
+                    .and_then(|m| m.lookup(sig.name))
+                    .map(std::string::ToString::to_string);
+                DecodedSignalDto::from_dbc_signal(sig, frame.timestamp, message_name, vessel_path)
+            })
             .collect(),
     )
 }

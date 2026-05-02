@@ -3,6 +3,7 @@
 #
 # `pelorus-inspector` pulls in Tauri: Linux runners need GTK/WebKit packages and a
 # minimal `pelorus-inspector/dist/index.html` so `build.rs` and `cargo test` compile.
+# Shared setup: `scripts/ci-setup-inspector-linux.sh`
 #
 # Use `dtolnay/rust-toolchain@master` + `toolchain` input so optional `components`
 # (rustfmt, clippy) install correctly for the pinned toolchain.
@@ -17,6 +18,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: "1.88.0"
 
 jobs:
   test:
@@ -25,53 +27,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Linux packages for Pelorus Inspector (Tauri)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev
-
-      - name: Minimal dist for Pelorus Inspector build.rs
-        run: |
-          mkdir -p pelorus-inspector/dist
-          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+      - name: Linux + Inspector dist (full workspace)
+        run: bash scripts/ci-setup-inspector-linux.sh
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.88.0"
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
       - run: cargo test --workspace --all-features --verbose
 
   pelorus-core-canbus:
-    name: Pelorus Core (canbus + alloc, no defaults)
+    name: Pelorus Core (canbus / canbus_heapless, no defaults)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Linux packages for Pelorus Inspector (Tauri)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
-      - name: Minimal dist for Pelorus Inspector build.rs
-        run: |
-          mkdir -p pelorus-inspector/dist
-          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+      - run: cargo check -p pelorus-core --no-default-features --features canbus,alloc --verbose
+
+      - run: cargo check -p pelorus-core --no-default-features --features canbus_heapless --verbose
+
+  dbc-rs-heapless:
+    name: dbc-rs + pelorus-bounded (heapless, no alloc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.88.0"
-      - run: cargo check -p pelorus-core --no-default-features --features canbus,alloc --verbose
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+
+      - run: cargo check -p pelorus-bounded --no-default-features --features heapless --verbose
+
+      - run: cargo check -p dbc-rs --no-default-features --features heapless,attributes --verbose
 
   clippy:
     name: Clippy (workspace)
@@ -79,25 +69,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Linux packages for Pelorus Inspector (Tauri)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev
-
-      - name: Minimal dist for Pelorus Inspector build.rs
-        run: |
-          mkdir -p pelorus-inspector/dist
-          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+      - name: Linux + Inspector dist (full workspace)
+        run: bash scripts/ci-setup-inspector-linux.sh
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.88.0"
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: clippy
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
 
@@ -108,7 +85,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.88.0"
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
           components: rustfmt
       - run: cargo fmt --all -- --check
 
@@ -118,25 +95,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Linux packages for Pelorus Inspector (Tauri)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libsoup-3.0-dev \
-            libjavascriptcoregtk-4.1-dev
-
-      - name: Minimal dist for Pelorus Inspector build.rs
-        run: |
-          mkdir -p pelorus-inspector/dist
-          printf '%s\n' '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>' > pelorus-inspector/dist/index.html
+      - name: Linux + Inspector dist (full workspace)
+        run: bash scripts/ci-setup-inspector-linux.sh
 
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.88.0"
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
       - env:
           RUSTDOCFLAGS: -D warnings
         run: cargo doc --workspace --no-deps --all-features

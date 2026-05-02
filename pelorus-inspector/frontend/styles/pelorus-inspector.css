@@ -308,7 +308,8 @@
 .cv-app > .cv-panel,
 .cv-app > cv-mdf4-inspector,
 .cv-app > cv-live-viewer,
-.cv-app > cv-dbc-editor {
+.cv-app > cv-dbc-editor,
+.cv-app > cv-vss-editor {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -753,6 +754,30 @@
   font-variant-numeric: tabular-nums;
 }
 .cv-cell-unit { color: var(--cv-text-muted); font-style: italic; }
+
+/* VSS vessel path column (decoded signals, MDF4, live capture) */
+.cv-vessel-cell {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cv-vessel-path {
+  font-size: 0.78rem;
+  color: var(--cv-text-muted);
+  white-space: nowrap;
+}
+.cv-muted {
+  color: var(--cv-text-dim);
+  font-style: italic;
+}
+.cv-signal-vessel {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--cv-text-muted);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* Compact table variant */
 .cv-table-compact th,

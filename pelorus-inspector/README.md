@@ -4,6 +4,8 @@ Desktop tooling for sailors and integrators **by sailors, for sailors**: inspect
 
 This package is the **successor** to the archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer). Source of truth lives in **`pelorus-marine/platform`** ([`pelorus-inspector/` tree](https://github.com/pelorus-marine/platform/tree/main/pelorus-inspector)). In-tree **`dbc-rs`** / **`mdf4-rs`** satisfy `path` deps for the Pelorus stack.
 
+**Embedded-first:** host tooling visualizes and edits what vessel-side stacks produce; policy lives in **[Embedded-first](../README.md#embedded-first)**.
+
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-informational)](LICENSING.md)
 
 ## Features
