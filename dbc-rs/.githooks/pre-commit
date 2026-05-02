@@ -1,0 +1,135 @@
+#!/bin/bash
+# Pre-commit hook to run quality checks before allowing commits
+#
+# This hook ensures that code quality checks pass before commits are made.
+# It runs tests, clippy, and formatting checks on all feature combinations.
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo -e "${YELLOW}Running pre-commit checks...${NC}"
+
+# Check if cargo is available
+if ! command -v cargo &> /dev/null; then
+    echo -e "${RED}Error: cargo not found. Please install Rust toolchain.${NC}"
+    exit 1
+fi
+
+# Get the repository root
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# Ensure latest stable clippy is available (for better linting)
+echo -e "${YELLOW}Ensuring latest stable clippy is available...${NC}"
+if ! rustup run stable cargo clippy --version &> /dev/null; then
+    echo -e "${YELLOW}Installing latest stable toolchain with clippy...${NC}"
+    rustup toolchain install stable --component clippy || {
+        echo -e "${RED}Error: Failed to install stable toolchain with clippy.${NC}"
+        exit 1
+    }
+fi
+
+# Install embedded target if not already installed
+echo -e "${YELLOW}Ensuring embedded target is available...${NC}"
+if ! rustup target list --installed | grep -q "thumbv7em-none-eabihf"; then
+    echo -e "${YELLOW}Installing embedded target thumbv7em-none-eabihf...${NC}"
+    rustup target add thumbv7em-none-eabihf || {
+        echo -e "${RED}Error: Failed to install embedded target.${NC}"
+        exit 1
+    }
+fi
+
+# Track if any checks failed
+FAILED=0
+
+# Run tests with default features (std)
+echo -e "\n${YELLOW}Running tests with default features (std)...${NC}"
+if cargo test --quiet 2>&1; then
+    echo -e "${GREEN}✓ Tests passed (std)${NC}"
+else
+    echo -e "${RED}✗ Tests failed (std)${NC}"
+    FAILED=1
+fi
+
+# Run tests with alloc feature
+echo -e "\n${YELLOW}Running tests with alloc feature...${NC}"
+if cargo test --quiet --no-default-features --features alloc 2>&1; then
+    echo -e "${GREEN}✓ Tests passed (alloc)${NC}"
+else
+    echo -e "${RED}✗ Tests failed (alloc)${NC}"
+    FAILED=1
+fi
+
+# Run tests with heapless feature (with reduced constants to avoid stack overflow)
+echo -e "\n${YELLOW}Running tests with heapless feature (release mode, reduced constants)...${NC}"
+if DBC_MAX_MESSAGES=16 DBC_MAX_SIGNALS_PER_MESSAGE=8 DBC_MAX_NODES=4 DBC_MAX_EXTENDED_MULTIPLEXING=8 cargo test --quiet --release --no-default-features --features heapless 2>&1; then
+    echo -e "${GREEN}✓ Tests passed (heapless)${NC}"
+else
+    echo -e "${RED}✗ Tests failed (heapless)${NC}"
+    FAILED=1
+fi
+
+# Run clippy with heapless feature (embedded)
+# Note: DBC_MAX_MESSAGES must be a power of 2 for heapless (build.rs validates this)
+echo -e "\n${YELLOW}Running clippy (heapless embedded)...${NC}"
+if DBC_MAX_MESSAGES=512 rustup run stable cargo clippy --no-default-features --features heapless --target thumbv7em-none-eabihf -- -D warnings 2>&1; then
+    echo -e "${GREEN}✓ Clippy check passed (heapless embedded)${NC}"
+else
+    echo -e "${RED}✗ Clippy check failed (heapless embedded)${NC}"
+    FAILED=1
+fi
+
+# Run clippy with heapless feature (x86_64)
+echo -e "\n${YELLOW}Running clippy (heapless x86_64)...${NC}"
+if DBC_MAX_MESSAGES=512 rustup run stable cargo clippy --no-default-features --features heapless --lib --bins -- -D warnings 2>&1; then
+    echo -e "${GREEN}✓ Clippy check passed (heapless x86_64)${NC}"
+else
+    echo -e "${RED}✗ Clippy check failed (heapless x86_64)${NC}"
+    FAILED=1
+fi
+
+# Run clippy with alloc feature (embedded)
+echo -e "\n${YELLOW}Running clippy (alloc embedded)...${NC}"
+if rustup run stable cargo clippy --no-default-features --features alloc --target thumbv7em-none-eabihf -- -D warnings 2>&1; then
+    echo -e "${GREEN}✓ Clippy check passed (alloc embedded)${NC}"
+else
+    echo -e "${RED}✗ Clippy check failed (alloc embedded)${NC}"
+    FAILED=1
+fi
+
+# Run clippy using latest stable (std feature)
+echo -e "\n${YELLOW}Running clippy (std feature)...${NC}"
+if rustup run stable cargo clippy --lib --bins -- -D warnings 2>&1; then
+    echo -e "${GREEN}✓ Clippy check passed (std)${NC}"
+else
+    echo -e "${RED}✗ Clippy check failed (std)${NC}"
+    FAILED=1
+fi
+
+# Check formatting using pinned toolchain (from rust-toolchain.toml)
+# This ensures consistent formatting across all workstations
+echo -e "\n${YELLOW}Checking code formatting (using pinned toolchain)...${NC}"
+if cargo fmt -- --check 2>&1; then
+    echo -e "${GREEN}✓ Code formatting check passed${NC}"
+else
+    echo -e "${RED}✗ Code formatting check failed${NC}"
+    echo -e "${YELLOW}Run 'cargo fmt' to fix formatting issues${NC}"
+    FAILED=1
+fi
+
+
+# Exit with error if any check failed
+if [ $FAILED -eq 1 ]; then
+    echo -e "\n${RED}Pre-commit checks failed. Please fix the issues above before committing.${NC}"
+    echo -e "${YELLOW}To skip this hook, use: git commit --no-verify${NC}"
+    exit 1
+fi
+
+echo -e "\n${GREEN}All pre-commit checks passed!${NC}"
+exit 0
+

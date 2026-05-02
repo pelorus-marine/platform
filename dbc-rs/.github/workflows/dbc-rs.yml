@@ -1,0 +1,234 @@
+name: dbc-rs Library CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'benches/**'
+      - 'tests/**'
+      - 'Cargo.toml'
+      - 'build.rs'
+      - '.github/workflows/dbc-rs.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'benches/**'
+      - 'tests/**'
+      - 'Cargo.toml'
+      - 'build.rs'
+      - '.github/workflows/dbc-rs.yml'
+
+env:
+  CARGO_TERM_COLOR: always
+  MSRV: "1.85.0"
+
+jobs:
+  test-std:
+    name: Test (std, latest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Build library with std feature
+        run: cargo build --verbose
+      - name: Run tests with std feature
+        run: cargo test --verbose
+
+  test-alloc:
+    name: Test (alloc, latest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test with alloc feature
+        run: cargo test --verbose --no-default-features --features alloc
+      - name: Build with alloc feature (release)
+        run: cargo build --release --verbose --no-default-features --features alloc
+      - name: Install embedded target
+        run: rustup target add thumbv7em-none-eabihf
+      - name: Build alloc on embedded target
+        run: cargo build --release --verbose --no-default-features --features alloc --target thumbv7em-none-eabihf
+
+  test-heapless:
+    name: Test (heapless, latest)
+    runs-on: ubuntu-latest
+    env:
+      DBC_MAX_MESSAGES: 16
+      DBC_MAX_SIGNALS_PER_MESSAGE: 8
+      DBC_MAX_NODES: 4
+      DBC_MAX_EXTENDED_MULTIPLEXING: 8
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test heapless feature (x86_64, release mode with reduced constants)
+        run: cargo test --release --verbose --no-default-features --features heapless
+      - name: Build heapless (x86_64, release)
+        run: cargo build --release --verbose --no-default-features --features heapless
+      - name: Install embedded target
+        run: rustup target add thumbv7em-none-eabihf
+      - name: Build heapless on embedded target
+        run: cargo build --release --verbose --no-default-features --features heapless --target thumbv7em-none-eabihf
+
+  test-std-msrv:
+    name: Test (std, MSRV)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (MSRV 1.85.0)
+        uses: dtolnay/rust-toolchain@1.85.0
+      - name: Build library with std feature (MSRV)
+        run: cargo build --verbose
+      - name: Run tests with std feature (MSRV)
+        run: cargo test --verbose --lib --tests
+
+  test-alloc-msrv:
+    name: Test (alloc, MSRV)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (MSRV 1.85.0)
+        uses: dtolnay/rust-toolchain@1.85.0
+      - name: Test with alloc feature (MSRV)
+        run: cargo test --verbose --no-default-features --features alloc
+      - name: Build with alloc feature (MSRV, release)
+        run: cargo build --release --verbose --no-default-features --features alloc
+      - name: Install embedded target
+        run: rustup target add thumbv7em-none-eabihf
+      - name: Build alloc on embedded target (MSRV)
+        run: cargo build --release --verbose --no-default-features --features alloc --target thumbv7em-none-eabihf
+
+  test-heapless-msrv:
+    name: Test (heapless, MSRV)
+    runs-on: ubuntu-latest
+    env:
+      DBC_MAX_MESSAGES: 16
+      DBC_MAX_SIGNALS_PER_MESSAGE: 8
+      DBC_MAX_NODES: 4
+      DBC_MAX_EXTENDED_MULTIPLEXING: 8
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (MSRV 1.85.0)
+        uses: dtolnay/rust-toolchain@1.85.0
+      - name: Test heapless feature (MSRV, release mode with reduced constants)
+        run: cargo test --release --verbose --no-default-features --features heapless
+      - name: Build heapless (MSRV, release)
+        run: cargo build --release --verbose --no-default-features --features heapless
+      - name: Install embedded target
+        run: rustup target add thumbv7em-none-eabihf
+      - name: Build heapless on embedded target (MSRV)
+        run: cargo build --release --verbose --no-default-features --features heapless --target thumbv7em-none-eabihf
+
+  lint:
+    name: Lint (clippy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Install target standard library
+        run: rustup target add thumbv7em-none-eabihf
+      - name: Run clippy linter (std feature)
+        run: rustup run stable cargo clippy --verbose --lib --bins -- -D warnings
+      - name: Run clippy linter (alloc feature)
+        run: rustup run stable cargo clippy --verbose --no-default-features --features alloc --lib --bins -- -D warnings
+      - name: Run clippy linter (heapless x86_64)
+        run: rustup run stable cargo clippy --verbose --no-default-features --features heapless --lib --bins -- -D warnings
+      - name: Run clippy linter (heapless embedded)
+        run: rustup run stable cargo clippy --verbose --no-default-features --features heapless --target thumbv7em-none-eabihf -- -D warnings
+      - name: Run clippy linter (alloc embedded)
+        run: rustup run stable cargo clippy --verbose --no-default-features --features alloc --target thumbv7em-none-eabihf -- -D warnings
+
+  fmt:
+    name: Format check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (from rust-toolchain.toml)
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.85.0
+          components: rustfmt
+        # Uses MSRV (1.85.0) for consistent formatting across all developers
+      - name: Check code formatting
+        run: cargo fmt --verbose -- --check
+
+  doc:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Check documentation
+        env:
+          RUSTDOCFLAGS: "-D warnings"
+        run: cargo doc --no-deps
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - name: Code coverage (summary, min 80% lines)
+        run: |
+          set -euo pipefail
+          cargo llvm-cov \
+            --tests \
+            --lib \
+            --ignore-filename-regex "^(tests|examples|benches)/" \
+            --fail-under-lines 80 \
+            --json --summary-only \
+            --output-path coverage-summary.json
+          echo "Coverage totals (library + integration tests; paths under tests/, examples/, benches/ excluded from report):"
+          jq '.data[0].totals | {lines, functions, regions}' coverage-summary.json
+
+  benchmark:
+    name: Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+      - name: Run benchmarks in test mode
+        run: cargo test --benches --verbose
+      # Run actual benchmarks and save baseline for comparison
+      - name: Run benchmarks and save baseline
+        continue-on-error: true
+        run: |
+          # Save baseline with commit SHA for tracking
+          BASELINE_NAME="ci-$(git rev-parse --short HEAD)"
+          cargo bench --bench parse_bench --verbose -- --save-baseline "$BASELINE_NAME"
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: criterion-results-${{ github.ref_name == 'main' && 'main' || format('commit-{0}', github.sha) }}
+          path: |
+            criterion/
+            target/criterion/
+          retention-days: 90
+
