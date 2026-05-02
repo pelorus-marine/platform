@@ -58,7 +58,7 @@ Publishing **`dbc-rs`** / **`mdf4-rs`** to crates.io from this tree is supported
 
 Separate **`pelorus-marine/dbc-rs`** / **`pelorus-marine/mdf4-rs`** GitHub repositories are **optional** (ecosystem and branding); **`pelorus-core`** integration assumes **only** this workspace—in-tree crates and subtree policy—without requiring standalone org-only library repos.
 
-Further context: normative specs stay in `specifications/`, the ECDIS app in `ecdis/`. Cross-layer traceability and rituals: [`PELORUS_ALIGNMENT.md`](../PELORUS_ALIGNMENT.md).
+Further context: normative specs stay in `specifications/`, the ECDIS app in `ecdis/`. Cross-layer traceability and rituals: [Pelorus alignment](https://github.com/pelorus-marine/specifications/blob/main/PELORUS_ALIGNMENT.md) (`pelorus-marine/specifications`).
 
 | Member | Role |
 |--------|------|
