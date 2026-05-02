@@ -882,7 +882,7 @@
   height: 100%;
 }
 
-/* Legacy group header for tables */
+/* Group header for stacked table sections */
 .cv-group-header td {
   background: var(--cv-bg-alt);
   color: var(--cv-text);

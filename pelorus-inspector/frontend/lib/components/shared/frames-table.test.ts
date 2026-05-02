@@ -36,10 +36,11 @@ describe('FramesTableElement', () => {
     element.remove();
   });
 
-  describe('setMessageNameLookup', () => {
-    it('should set the message name lookup function', () => {
-      const lookup = (canId: number) => canId === 0x100 ? 'EngineData' : '-';
-      element.setMessageNameLookup(lookup);
+  describe('setMessageInfoLookup', () => {
+    it('should resolve message labels from CAN id', () => {
+      element.setMessageInfoLookup((canId) =>
+        canId === 0x100 ? { name: 'EngineData' } : { name: '-' },
+      );
 
       const frames = createMockFrames(1);
       frames[0].can_id = 0x100;

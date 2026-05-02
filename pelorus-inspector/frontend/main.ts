@@ -1,21 +1,30 @@
-import { TauriApi, PelorusInspectorElement } from './lib';
+import { PelorusInspectorElement, TauriApi } from './lib';
+import { registerPelorusPanels } from './lib/pelorus-panels';
 
-// Initialize and set up the Pelorus Inspector
-async function main(): Promise<void> {
-  // Create the API
+function reportBootstrapError(err: unknown): void {
+  console.error('[Pelorus Inspector] bootstrap failed', err);
+}
+
+/** Wire Tauri API, viewer element, and built-in lab panels. */
+async function bootstrap(): Promise<void> {
   const api = new TauriApi();
   await api.init();
 
-  // Get the viewer element and set the API
-  const viewer = document.querySelector('pelorus-inspector') as PelorusInspectorElement;
-  if (viewer) {
-    viewer.setApi(api);
+  const viewer = document.querySelector('pelorus-inspector');
+  if (!(viewer instanceof PelorusInspectorElement)) {
+    reportBootstrapError(new Error('pelorus-inspector root element missing'));
+    return;
   }
+
+  viewer.setApi(api);
+  await registerPelorusPanels(viewer);
 }
 
-// Run when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => void bootstrap().catch(reportBootstrapError),
+  );
 } else {
-  main();
+  void bootstrap().catch(reportBootstrapError);
 }

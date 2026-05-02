@@ -140,8 +140,8 @@ describe('state', () => {
       applyFiltersFromInputs(state, '', '', '', '');
       expect(state.filters.timeMin).toBeNull();
       expect(state.filters.timeMax).toBeNull();
-      expect(state.filters.canIds).toBeNull();
-      expect(state.filters.messages).toBeNull();
+      expect(state.filters.canIds).toEqual([]);
+      expect(state.filters.messages).toEqual([]);
     });
   });
 
@@ -157,8 +157,8 @@ describe('state', () => {
 
       expect(state.filters.timeMin).toBeNull();
       expect(state.filters.timeMax).toBeNull();
-      expect(state.filters.canIds).toBeNull();
-      expect(state.filters.messages).toBeNull();
+      expect(state.filters.canIds).toEqual([]);
+      expect(state.filters.messages).toEqual([]);
       expect(state.selectedFrameIndex).toBeNull();
     });
   });

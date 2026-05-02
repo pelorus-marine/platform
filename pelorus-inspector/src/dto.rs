@@ -230,7 +230,7 @@ impl CanFrameDto {
                 dlc: data_frame.dlc() as u8,
                 data: data_frame.data().to_vec(),
             }),
-            socketcan::CanAnyFrame::Remote(_) => None, // Remote frames not supported (deprecated in CAN FD)
+            socketcan::CanAnyFrame::Remote(_) => None, // Omit remote frames (not represented in payloads)
             socketcan::CanAnyFrame::Fd(fd_frame) => Some(Self {
                 timestamp,
                 channel: channel.to_string(),

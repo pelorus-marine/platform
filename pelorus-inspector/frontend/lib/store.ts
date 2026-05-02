@@ -1,15 +1,15 @@
 /**
- * Simple Reactive Store
- *
- * Lightweight state management for high-frequency updates.
- * Use events for infrequent cross-component communication,
- * use stores for rapidly changing state that needs to be queried.
+ * Pelorus Inspector stores — MDF4/UI state, SocketCAN counters, workspace context, SQLite index.
  */
 
-import type { CanFrame, DecodedSignal } from './types';
+import type { CanBpfFilter, CanFrame, DecodedSignal } from './types';
+import type { ArtifactMeta } from './storage/types';
 
 type Listener<T> = (state: T) => void;
 
+/**
+ * Tiny reactive store. `get()` returns the live object — do not mutate it directly; use `set`.
+ */
 export function createStore<T extends object>(initialState: T) {
   let state = { ...initialState };
   const listeners = new Set<Listener<T>>();
@@ -29,18 +29,11 @@ export function createStore<T extends object>(initialState: T) {
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// App Store - global application state
-// ─────────────────────────────────────────────────────────────────────────────
-
+/** Global file + decode context */
 export interface AppState {
-  /** Current DBC file path (null if not loaded) */
   dbcFile: string | null;
-  /** Current MDF4 file path (null if not loaded/created) */
   mdf4File: string | null;
-  /** Loaded MDF4 frames */
   mdf4Frames: CanFrame[];
-  /** Pre-decoded signals from MDF4 (if DBC was loaded) */
   mdf4Signals: DecodedSignal[];
 }
 
@@ -51,10 +44,7 @@ export const appStore = createStore<AppState>({
   mdf4Signals: [],
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Live Store - high frequency updates during capture
-// ─────────────────────────────────────────────────────────────────────────────
-
+/** Live capture counters */
 export interface LiveState {
   isCapturing: boolean;
   currentInterface: string | null;
@@ -67,5 +57,51 @@ export const liveStore = createStore<LiveState>({
   currentInterface: null,
   frameCount: 0,
   messageCount: 0,
+});
+
+export type PanelLoadStatus = 'idle' | 'loading' | 'ready' | 'error';
+
+/** Path/display name pairs for workflow pickers */
+export interface WorkspacePath {
+  path: string;
+  name: string;
+}
+
+export interface CanGatewayRule {
+  id: number;
+  src: string;
+  dst: string;
+}
+
+/** CAN lab + workflow picker context (BPF maps, MDF4 paths used on canvas, gateways). */
+export interface PelorusWorkspace {
+  dbcFiles: WorkspacePath[];
+  mdf4Files: WorkspacePath[];
+  canInterfaces: WorkspacePath[];
+  gateways: CanGatewayRule[];
+  interfaceFilters: Record<string, CanBpfFilter[]>;
+}
+
+export const pelorusWorkspace = createStore<PelorusWorkspace>({
+  dbcFiles: [],
+  mdf4Files: [],
+  canInterfaces: [],
+  gateways: [],
+  interfaceFilters: {},
+});
+
+/** SQLite artifact listing cache (synced from storage panel) */
+export interface ArtifactIndex {
+  dbcArtifacts: ArtifactMeta[];
+  mdf4Artifacts: ArtifactMeta[];
+  rhaiArtifacts: ArtifactMeta[];
+  workflowArtifacts: ArtifactMeta[];
+}
+
+export const artifactIndex = createStore<ArtifactIndex>({
+  dbcArtifacts: [],
+  mdf4Artifacts: [],
+  rhaiArtifacts: [],
+  workflowArtifacts: [],
 });
 

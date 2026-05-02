@@ -6,8 +6,8 @@
  */
 
 import type { CanFrame, DbcInfo, DecodedSignal, FileFilter } from '../../types';
-import type { Filters } from '../../config';
-import { countActiveFilters, createEmptyFilters, filterFrames } from '../../config';
+import type { FilterConfig } from '../../config';
+import { countActiveFilters, createEmptyFilterConfig, filterFrames } from '../../config';
 import { events, emitMdf4Changed, emitFrameSelected, type DbcChangedEvent, type CaptureStoppedEvent } from '../../events';
 import { appStore } from '../../store';
 import styles from '../../../styles/pelorus-inspector.css?inline';
@@ -33,7 +33,7 @@ export interface Mdf4InspectorApi {
 interface Mdf4State {
   frames: CanFrame[];
   filteredFrames: CanFrame[];
-  filters: Filters;
+  filters: FilterConfig;
   selectedFrameIndex: number | null;
   dbcInfo: DbcInfo | null;
   currentFile: string | null;
@@ -43,7 +43,7 @@ function createInitialState(): Mdf4State {
   return {
     frames: [],
     filteredFrames: [],
-    filters: createEmptyFilters(),
+    filters: createEmptyFilterConfig(),
     selectedFrameIndex: null,
     dbcInfo: null,
     currentFile: null,
@@ -383,7 +383,7 @@ export class Mdf4InspectorElement extends HTMLElement {
 
     // Filter changes
     this.filtersPanel?.addEventListener('filter-change', (e: Event) => {
-      const filters = (e as CustomEvent<Filters>).detail;
+      const filters = (e as CustomEvent<FilterConfig>).detail;
       this.state.filters = filters;
       this.applyFilters();
       this.renderFrames();

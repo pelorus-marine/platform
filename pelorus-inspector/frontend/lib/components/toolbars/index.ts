@@ -1,10 +1,8 @@
 /**
- * Toolbar Components
- *
- * Dedicated toolbar components for each tab.
- * Each toolbar subscribes to relevant events and manages its own UI.
+ * Pro Toolbars
  */
 
-export * from './mdf4-toolbar';
-export * from './live-toolbar';
-export * from './dbc-toolbar';
+import './can-config-toolbar.js';
+import './simulator-toolbar.js';
+import './decoder-toolbar.js';
+import './workflow-toolbar.js';

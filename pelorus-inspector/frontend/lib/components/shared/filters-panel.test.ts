@@ -68,9 +68,9 @@ describe('FiltersPanelElement', () => {
 
       expect(filters.timeMin).toBeNull();
       expect(filters.timeMax).toBeNull();
-      expect(filters.canIds).toBeNull();
-      expect(filters.messages).toBeNull();
-      expect(filters.signals).toBeNull();
+      expect(filters.canIds).toEqual([]);
+      expect(filters.messages).toEqual([]);
+      expect(filters.signals).toEqual([]);
       expect(filters.dataPattern).toBeNull();
       expect(filters.channel).toBeNull();
       expect(filters.matchStatus).toBe('all');
@@ -132,9 +132,9 @@ describe('FiltersPanelElement', () => {
       return eventPromise.then((event) => {
         expect(event.detail.timeMin).toBeNull();
         expect(event.detail.timeMax).toBeNull();
-        expect(event.detail.canIds).toBeNull();
-        expect(event.detail.messages).toBeNull();
-        expect(event.detail.signals).toBeNull();
+        expect(event.detail.canIds).toEqual([]);
+        expect(event.detail.messages).toEqual([]);
+        expect(event.detail.signals).toEqual([]);
         expect(event.detail.matchStatus).toBe('all');
       });
     });

@@ -214,7 +214,7 @@ export interface InitialFiles {
 
 /** Pelorus Inspector configuration */
 export interface InspectorConfig {
-  /** Application name (e.g., "Pelorus Inspector" or "Pelorus Inspector Pro") */
+  /** Application name shown in the shell */
   appName?: string;
   /** Show DBC tab */
   showDbcTab?: boolean;
@@ -224,8 +224,8 @@ export interface InspectorConfig {
   showMdf4Tab?: boolean;
   /** Show About tab */
   showAboutTab?: boolean;
-  /** Initial active tab */
-  initialTab?: 'mdf4' | 'live' | 'dbc' | 'about';
+  /** Initial active tab (core: mdf4, live, dbc, about; lab: can, simulator, decoder, workflow, storage) */
+  initialTab?: string;
   /** Enable auto-scroll */
   autoScroll?: boolean;
   /** Maximum frames to keep in memory */
@@ -288,7 +288,7 @@ export interface FileFilter {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Extension System (for Pro versions)
+// Extension tabs (optional integrations)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Extension tab configuration */
@@ -303,7 +303,7 @@ export interface ExtensionTab {
   title?: string;
 }
 
-/** Extension interface for pro features */
+/** Extension interface for lab / optional panels */
 export interface InspectorExtension {
   /** Unique extension ID */
   id: string;

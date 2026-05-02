@@ -1,5 +1,12 @@
 import type { CanFrame, DecodedSignal, DbcInfo, InspectorConfig, MessageInfo } from './types';
-import { defaultConfig, createEmptyFilters, parseCanIds, parseMessageNames, filterFrames, type Filters } from './config';
+import {
+  defaultConfig,
+  createEmptyFilterConfig,
+  parseCanIds,
+  parseNames,
+  filterFrames,
+  type FilterConfig,
+} from './config';
 
 /** Pelorus Inspector component state */
 export interface ViewerState {
@@ -12,7 +19,7 @@ export interface ViewerState {
   activeTab: string;
   selectedMessageId: number | null;
   selectedFrameIndex: number | null;
-  filters: Filters;
+  filters: FilterConfig;
   config: Required<InspectorConfig>;
 }
 
@@ -29,7 +36,7 @@ export function createInitialState(config?: Partial<InspectorConfig>): ViewerSta
     activeTab: mergedConfig.initialTab,
     selectedMessageId: null,
     selectedFrameIndex: null,
-    filters: createEmptyFilters(),
+    filters: createEmptyFilterConfig(),
     config: mergedConfig,
   };
 }
@@ -69,13 +76,13 @@ export function applyFiltersFromInputs(
   state.filters.timeMin = timeMin ? parseFloat(timeMin) : null;
   state.filters.timeMax = timeMax ? parseFloat(timeMax) : null;
   state.filters.canIds = parseCanIds(canIdStr);
-  state.filters.messages = parseMessageNames(messageStr);
+  state.filters.messages = parseNames(messageStr);
   state.selectedFrameIndex = null;
 }
 
 /** Clear all filters */
 export function clearFilters(state: ViewerState): void {
-  state.filters = createEmptyFilters();
+  state.filters = createEmptyFilterConfig();
   state.selectedFrameIndex = null;
 }
 

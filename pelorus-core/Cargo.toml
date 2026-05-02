@@ -11,7 +11,7 @@ repository = "https://github.com/pelorus-marine/platform"
 [dependencies]
 dbc-rs = { path = "../dbc-rs", optional = true, default-features = false }
 mdf4-rs = { path = "../mdf4-rs", optional = true, default-features = false }
-embedded-can = { version = "0.4.1", optional = true }
+embedded-can = { workspace = true, optional = true }
 
 [features]
 default = ["std", "canbus", "vdr"]

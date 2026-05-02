@@ -53,12 +53,7 @@ export class FramesTableElement extends HTMLElement {
     this.delegatedHandler = null;
   }
 
-  /** Set the message name lookup function (legacy - returns string) */
-  setMessageNameLookup(fn: (canId: number) => string): void {
-    this.messageInfoLookup = (canId) => ({ name: fn(canId) });
-  }
-
-  /** Set the message info lookup function (returns name + optional comment) */
+  /** Set the message lookup (name plus optional DBC comment). */
   setMessageInfoLookup(fn: (canId: number) => MessageLookupResult): void {
     this.messageInfoLookup = fn;
   }

@@ -1,4 +1,4 @@
-import { parseCanIds, parseMessageNames, parseDataPattern, countActiveFilters, type Filters } from '../../config';
+import { parseCanIds, parseNames, parseDataPattern, countActiveFilters, type FilterConfig } from '../../config';
 
 /** Filters panel component */
 export class FiltersPanelElement extends HTMLElement {
@@ -60,7 +60,7 @@ export class FiltersPanelElement extends HTMLElement {
   }
 
   /** Get current filter values */
-  getFilters(): Filters {
+  getFilters(): FilterConfig {
     const timeMin = this.getInputValue('filterTimeMin');
     const timeMax = this.getInputValue('filterTimeMax');
     const canIdStr = this.getInputValue('filterCanId');
@@ -74,8 +74,8 @@ export class FiltersPanelElement extends HTMLElement {
       timeMin: timeMin ? parseFloat(timeMin) : null,
       timeMax: timeMax ? parseFloat(timeMax) : null,
       canIds: parseCanIds(canIdStr),
-      messages: parseMessageNames(messageStr),
-      signals: parseMessageNames(signalStr),
+      messages: parseNames(messageStr),
+      signals: parseNames(signalStr),
       dataPattern: parseDataPattern(dataPatternStr),
       channel: channelStr || null,
       matchStatus: matchStatus || 'all',

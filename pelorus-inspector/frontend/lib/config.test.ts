@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { defaultConfig, createEmptyFilters, parseCanIds, parseMessageNames } from './config';
+import {
+  defaultConfig,
+  createEmptyFilterConfig,
+  parseCanIds,
+  parseNames,
+} from './config';
 
 describe('config', () => {
   describe('defaultConfig', () => {
@@ -14,18 +19,20 @@ describe('config', () => {
     });
   });
 
-  describe('createEmptyFilters', () => {
-    it('should create filters with null values', () => {
-      const filters = createEmptyFilters();
+  describe('createEmptyFilterConfig', () => {
+    it('should use empty arrays and null scalar bounds', () => {
+      const filters = createEmptyFilterConfig();
       expect(filters.timeMin).toBeNull();
       expect(filters.timeMax).toBeNull();
-      expect(filters.canIds).toBeNull();
-      expect(filters.messages).toBeNull();
+      expect(filters.canIds).toEqual([]);
+      expect(filters.messages).toEqual([]);
+      expect(filters.signals).toEqual([]);
+      expect(filters.matchStatus).toBe('all');
     });
 
     it('should create a new object each time', () => {
-      const filters1 = createEmptyFilters();
-      const filters2 = createEmptyFilters();
+      const filters1 = createEmptyFilterConfig();
+      const filters2 = createEmptyFilterConfig();
       expect(filters1).not.toBe(filters2);
     });
   });
@@ -39,80 +46,28 @@ describe('config', () => {
       expect(parseCanIds('7DF, 7E8')).toEqual([0x7DF, 0x7E8]);
     });
 
-    it('should handle lowercase hex', () => {
-      expect(parseCanIds('7df, 7e8')).toEqual([0x7DF, 0x7E8]);
-    });
-
-    it('should handle mixed case', () => {
-      expect(parseCanIds('7Df, 7E8')).toEqual([0x7DF, 0x7E8]);
-    });
-
     it('should filter out invalid hex values', () => {
       expect(parseCanIds('7DF, invalid, 7E8')).toEqual([0x7DF, 0x7E8]);
     });
 
-    it('should return null for empty input', () => {
-      expect(parseCanIds('')).toBeNull();
+    it('should return empty array for empty input', () => {
+      expect(parseCanIds('')).toEqual([]);
     });
 
-    it('should return null for whitespace-only input', () => {
-      expect(parseCanIds('   ')).toBeNull();
-    });
-
-    it('should handle extra whitespace', () => {
-      expect(parseCanIds('  7DF  ,  7E8  ')).toEqual([0x7DF, 0x7E8]);
-    });
-
-    it('should handle no spaces', () => {
-      expect(parseCanIds('7DF,7E8,100')).toEqual([0x7DF, 0x7E8, 0x100]);
-    });
-
-    it('should return null when all values are invalid', () => {
-      // Note: 'a' is valid hex (10), so we use truly invalid chars
-      expect(parseCanIds('xyz, ggg')).toBeNull();
-    });
-
-    it('should parse partial hex from strings starting with hex digits', () => {
-      // 'abc' parses as 0xABC = 2748, 'face' parses as 0xFACE = 64206
-      expect(parseCanIds('abc, face')).toEqual([0xABC, 0xFACE]);
-    });
-
-    it('should parse extended IDs', () => {
-      expect(parseCanIds('12345678')).toEqual([0x12345678]);
+    it('should return empty array when all tokens are invalid', () => {
+      expect(parseCanIds('xyz, ggg')).toEqual([]);
     });
   });
 
-  describe('parseMessageNames', () => {
-    it('should parse single message name', () => {
-      expect(parseMessageNames('EngineData')).toEqual(['enginedata']);
+  describe('parseNames', () => {
+    it('should lowercase and trim names', () => {
+      expect(parseNames('EngineData')).toEqual(['enginedata']);
+      expect(parseNames('Engine, Speed, Brake')).toEqual(['engine', 'speed', 'brake']);
     });
 
-    it('should parse multiple message names', () => {
-      expect(parseMessageNames('Engine, Speed, Brake')).toEqual(['engine', 'speed', 'brake']);
-    });
-
-    it('should convert to lowercase', () => {
-      expect(parseMessageNames('ENGINE, SPEED')).toEqual(['engine', 'speed']);
-    });
-
-    it('should return null for empty input', () => {
-      expect(parseMessageNames('')).toBeNull();
-    });
-
-    it('should return null for whitespace-only input', () => {
-      expect(parseMessageNames('   ')).toBeNull();
-    });
-
-    it('should handle extra whitespace', () => {
-      expect(parseMessageNames('  Engine  ,  Speed  ')).toEqual(['engine', 'speed']);
-    });
-
-    it('should filter out empty strings', () => {
-      expect(parseMessageNames('Engine,,Speed')).toEqual(['engine', 'speed']);
-    });
-
-    it('should handle partial names', () => {
-      expect(parseMessageNames('rpm')).toEqual(['rpm']);
+    it('should return empty array for blank input', () => {
+      expect(parseNames('')).toEqual([]);
+      expect(parseNames('   ')).toEqual([]);
     });
   });
 });

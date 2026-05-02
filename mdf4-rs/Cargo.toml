@@ -26,17 +26,17 @@ compression = ["dep:miniz_oxide", "alloc"]
 [dependencies]
 
 [dependencies.serde]
-version = "1.0"
+workspace = true
 default-features = false
 features = ["derive", "alloc"]
 optional = true
 
 [dependencies.serde_json]
-version = "1.0"
+workspace = true
 optional = true
 
 [dependencies.embedded-can]
-version = "0.4.1"
+workspace = true
 optional = true
 
 [dependencies.dbc-rs]
@@ -55,11 +55,11 @@ optional = true
 [dev-dependencies]
 
 [dev-dependencies.serde]
-version = "1.0"
+workspace = true
 features = ["derive"]
 
 [dev-dependencies.embedded-can]
-version = "0.4"
+workspace = true
 
 [dev-dependencies.dbc-rs]
 path = "../dbc-rs"

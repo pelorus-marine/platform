@@ -22,7 +22,7 @@ pub enum MatchStatus {
     Unmatched,
 }
 
-/// Filter configuration matching TypeScript `Filters` interface.
+/// Filter configuration matching frontend `FilterConfig` (camelCase JSON).
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct FilterConfig {

@@ -10,7 +10,7 @@
 import type { InspectorApi, InspectorConfig, DbcInfo, InspectorExtension } from './types';
 import { extractFilename } from './utils';
 import { events, emitDbcChanged, type TabSwitchEvent } from './events';
-import { appStore } from './store';
+import { appStore, pelorusWorkspace } from './store';
 import { defaultConfig } from './config';
 import { mapDbcInfoToDto, createEmptyDbcDto } from './dbc-mapping';
 import { getVersion } from '@tauri-apps/api/app';
@@ -52,8 +52,8 @@ export class PelorusInspectorElement extends HTMLElement {
   private liveViewer: LiveViewerElement | null = null;
   private dbcEditor: DbcEditorComponent | null = null;
 
-  // Extension system
-  private extensions: InspectorExtension[] = [];
+  // Lab / extension panels (CAN, simulator, decoder, workflow, storage)
+  private extensions = new Map<string, { ext: InspectorExtension; disabled: boolean }>();
   private aboutExtensions: Array<{ id: string; label: string; panel: string }> = [];
 
   // Bound handlers for cleanup
@@ -94,18 +94,33 @@ export class PelorusInspectorElement extends HTMLElement {
     }
   }
 
-  /** Register an extension (adds tab + panel) */
-  async registerExtension(ext: InspectorExtension): Promise<void> {
-    this.extensions.push(ext);
-
-    // Run extension setup if provided
-    if (ext.setup && this.api) {
+  /** Register a lab extension (tab + optional toolbar + panel). */
+  async registerExtension(ext: InspectorExtension, disabled = false): Promise<void> {
+    this.extensions.set(ext.id, { ext, disabled });
+    if (this.api && ext.setup && !disabled) {
       await ext.setup(this.api);
     }
-
-    // Re-render to include new tab/panel
     if (this.isConnected) {
       this.render();
+      this.setupComponents();
+    }
+  }
+
+  /** Lab extensions currently registered */
+  getExtensions(): InspectorExtension[] {
+    return Array.from(this.extensions.values()).map(entry => entry.ext);
+  }
+
+  /** Stop an extension and drop its tab/panel (teardown if provided). */
+  unregisterExtension(id: string): void {
+    const entry = this.extensions.get(id);
+    if (entry?.ext.teardown) {
+      entry.ext.teardown();
+    }
+    this.extensions.delete(id);
+    if (this.isConnected) {
+      this.render();
+      this.setupComponents();
     }
   }
 
@@ -163,14 +178,30 @@ export class PelorusInspectorElement extends HTMLElement {
   }
 
   private generateTemplate(): string {
-    const extensionTabs = this.extensions
-      .filter(ext => ext.tab)
-      .map(ext => `<button class="cv-tab" data-tab="${ext.tab!.id}" title="${ext.tab!.title || ''}">${ext.tab!.icon || ''}${ext.tab!.label}</button>`)
+    const extensionTabs = Array.from(this.extensions.values())
+      .filter(({ ext }) => ext.tab)
+      .map(({ ext, disabled }) => {
+        const disabledClass = disabled ? ' disabled' : '';
+        const disabledAttr = disabled ? ' data-disabled="true"' : '';
+        const icon = ext.tab!.icon || '';
+        return `<button class="cv-tab${disabledClass}" data-tab="${ext.tab!.id}" title="${ext.tab!.title || ''}"${disabledAttr}>${icon}${ext.tab!.label}</button>`;
+      })
       .join('');
 
-    const extensionPanels = this.extensions
-      .filter(ext => ext.panel)
-      .map(ext => `<${ext.panel} class="cv-panel hidden" id="${ext.tab?.id || ext.id}Panel"></${ext.panel}>`)
+    const extensionToolbars = Array.from(this.extensions.values())
+      .filter(({ ext }) => ext.toolbar)
+      .map(({ ext, disabled }) => {
+        const disabledAttr = disabled ? ' data-disabled="true"' : '';
+        return `<${ext.toolbar}${disabledAttr}></${ext.toolbar}>`;
+      })
+      .join('');
+
+    const extensionPanels = Array.from(this.extensions.values())
+      .filter(({ ext }) => ext.panel && ext.tab)
+      .map(({ ext, disabled }) => {
+        const disabledClass = disabled ? ' cv-panel-disabled' : '';
+        return `<${ext.panel} class="cv-panel hidden${disabledClass}" id="${ext.tab!.id}Panel"></${ext.panel}>`;
+      })
       .join('');
 
     return `
@@ -193,10 +224,11 @@ export class PelorusInspectorElement extends HTMLElement {
           <cv-mdf4-toolbar></cv-mdf4-toolbar>
           <cv-live-toolbar></cv-live-toolbar>
           <cv-dbc-toolbar></cv-dbc-toolbar>
+          ${extensionToolbars}
           <div id="aboutTab" class="cv-toolbar cv-tab-pane cv-about-header">
             <span class="cv-about-title">${this.config.appName}</span>
             <span class="cv-about-version" id="appVersion"></span>
-            <span class="cv-about-desc">A desktop application for viewing and analyzing CAN bus data from MDF4 files and live SocketCAN interfaces.</span>
+            <span class="cv-about-desc">By sailors, for sailors — open tools for MDF4, SocketCAN, Rhai, and DBC workflows.</span>
           </div>
         </header>
         <cv-mdf4-inspector class="cv-panel hidden" id="mdf4Panel"></cv-mdf4-inspector>
@@ -234,13 +266,18 @@ export class PelorusInspectorElement extends HTMLElement {
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Built-in DBC Editor</span></div><p class="cv-card-body">Create and modify DBC files directly. Edit messages, signals, and their properties.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Real-time Monitors</span></div><p class="cv-card-body">Message monitor shows latest data per CAN ID. Signal monitor groups decoded values by message.</p></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">High Performance</span></div><p class="cv-card-body">Rust backend handles all processing. Pre-rendered updates minimize frontend overhead.</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">SocketCAN Lab</span></div><p class="cv-card-body">Create vcan/slcan interfaces, tune bit timing, and bridge buses with gateway helpers (where the OS allows).</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rhai Simulator</span></div><p class="cv-card-body">Script repeatable traffic for bring-up, commissioning, and bench testing with DBC-aware encoding.</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Message Lab</span></div><p class="cv-card-body">Pattern scans and byte-level stats to spot counters, gauges, and multiplexed fields without a DBC.</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Workflow Canvas</span></div><p class="cv-card-body">Chain decode, filters, Rhai transforms, and MDF4 sinks in a visual DAG executed fully in Rust.</p></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Voyage Stash</span></div><p class="cv-card-body">SQLite-backed storage for DBC, MDF4, Rhai scripts, and workflows with ZIP export for sharing.</p></div>
           </div>
         </div>
         <div class="cv-tab-pane" id="aboutAcknowledgments">
           <div class="cv-grid responsive">
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Standards</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://www.asam.net/standards/detail/mdf/" target="_blank">ASAM MDF4</a> – Measurement data format</li><li><a href="https://docs.kernel.org/networking/can.html" target="_blank">SocketCAN</a> – Linux CAN subsystem</li><li><a href="https://www.iso.org/standard/63648.html" target="_blank">ISO 11898</a> – CAN protocol spec</li></ul></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rust Core</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://tauri.app" target="_blank">Tauri</a> – Desktop app framework</li><li class="cv-sister-project"><a href="https://crates.io/crates/mdf4-rs" target="_blank">mdf4-rs</a> – MDF4 parser/writer</li><li class="cv-sister-project"><a href="https://crates.io/crates/dbc-rs" target="_blank">dbc-rs</a> – DBC parser/decoder</li><li><a href="https://crates.io/crates/socketcan" target="_blank">socketcan</a> – CAN FD bindings</li></ul></div>
-            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rust Ecosystem</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://tokio.rs" target="_blank">Tokio</a> – Async runtime</li><li><a href="https://serde.rs" target="_blank">Serde</a> – Serialization</li><li><a href="https://clap.rs" target="_blank">Clap</a> – CLI parser</li></ul></div>
+            <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Rust Ecosystem</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://tokio.rs" target="_blank">Tokio</a> – Async runtime</li><li><a href="https://serde.rs" target="_blank">Serde</a> – Serialization</li><li><a href="https://clap.rs" target="_blank">Clap</a> – CLI parser</li><li><a href="https://rhai.rs" target="_blank">Rhai</a> – Embedded scripting</li><li><a href="https://crates.io/crates/rusqlite" target="_blank">rusqlite</a> – SQLite</li><li><a href="https://crates.io/crates/zip" target="_blank">zip</a> – Archives</li></ul></div>
             <div class="cv-card"><div class="cv-card-header"><span class="cv-card-title">Frontend</span></div><ul class="cv-card-body cv-deps-list"><li><a href="https://vite.dev" target="_blank">Vite</a> – Build tool</li><li><a href="https://www.typescriptlang.org" target="_blank">TypeScript</a> – Typed JavaScript</li><li><a href="https://vitest.dev" target="_blank">Vitest</a> – Test framework</li></ul></div>
           </div>
           <p class="cv-about-license">MIT or Apache-2.0 • Rust + TypeScript</p>
@@ -260,7 +297,11 @@ export class PelorusInspectorElement extends HTMLElement {
     // Main tab switching
     this.shadow.querySelectorAll('.cv-tabs.bordered .cv-tab').forEach(btn => {
       btn.addEventListener('click', () => {
-        const tab = (btn as HTMLElement).dataset.tab;
+        const el = btn as HTMLElement;
+        if (el.dataset.disabled === 'true') {
+          return;
+        }
+        const tab = el.dataset.tab;
         if (tab) this.switchTab(tab);
       });
     });
@@ -356,6 +397,10 @@ export class PelorusInspectorElement extends HTMLElement {
       onLiveCaptureUpdate: (cb) => api.onLiveCaptureUpdate(cb),
       onCaptureFinalized: (cb) => api.onCaptureFinalized(cb),
       onCaptureError: (cb) => api.onCaptureError(cb),
+      getFiltersForInterface: (iface) => {
+        const { interfaceFilters } = pelorusWorkspace.get();
+        return interfaceFilters[iface];
+      },
     };
   }
 
@@ -460,10 +505,12 @@ export class PelorusInspectorElement extends HTMLElement {
     aboutPanel?.classList.toggle('hidden', tab !== 'about');
 
     // Show/hide extension panels
-    for (const ext of this.extensions) {
-      const panelId = ext.tab?.id || ext.id;
-      const panel = this.shadow.querySelector(`#${panelId}Panel`);
-      panel?.classList.toggle('hidden', tab !== panelId);
+    for (const { ext, disabled } of this.extensions.values()) {
+      if (ext.tab && ext.panel) {
+        const panel = this.shadow.querySelector(`#${ext.tab.id}Panel`);
+        panel?.classList.toggle('hidden', tab !== ext.tab.id);
+        panel?.classList.toggle('cv-panel-disabled', disabled);
+      }
     }
   }
 

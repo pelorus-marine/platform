@@ -2,7 +2,7 @@
  * Frame Filter Module
  *
  * Shared types and utilities for CAN frame filtering.
- * Used by both base (TypeScript) and Pro (Rust) filtering implementations.
+ * Used by the TypeScript viewer; live capture may use Rust `filter_frames` when wired.
  */
 
 import type { CanFrame, DbcInfo, MessageInfo } from './types';
@@ -134,14 +134,14 @@ export function parseNames(input: string): string[] {
 // Filter Utilities
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Count active filters (handles both FilterConfig and legacy Filters with null) */
-export function countActiveFilters(filters: FilterConfig | { canIds?: number[] | null; messages?: string[] | null; signals?: string[] | null; timeMin?: number | null; timeMax?: number | null; dataPattern?: string | null; channel?: string | null; matchStatus?: MatchStatus }): number {
+/** Count active filter constraints (non-default fields). */
+export function countActiveFilters(filters: FilterConfig): number {
   let count = 0;
-  if (filters.timeMin !== null && filters.timeMin !== undefined ||
-      filters.timeMax !== null && filters.timeMax !== undefined) count++;
-  if (filters.canIds && filters.canIds.length > 0) count++;
-  if (filters.messages && filters.messages.length > 0) count++;
-  if (filters.signals && filters.signals.length > 0) count++;
+  if (filters.timeMin !== null ||
+      filters.timeMax !== null) count++;
+  if (filters.canIds.length > 0) count++;
+  if (filters.messages.length > 0) count++;
+  if (filters.signals.length > 0) count++;
   if (filters.dataPattern) count++;
   if (filters.channel) count++;
   if (filters.matchStatus && filters.matchStatus !== 'all') count++;
@@ -156,8 +156,8 @@ function getMessageInfo(dbcInfo: DbcInfo | null, canId: number): MessageInfo | n
 
 /**
  * Filter frames based on filter configuration.
- * This is the TypeScript implementation used by base pelorus-inspector.
- * Pro version uses Rust backend via filter_frames command.
+ * This is the TypeScript implementation used by Pelorus Inspector.
+ * Backend `filter_frames` mirrors this behavior for live streams when used.
  */
 export function filterFrames(frames: CanFrame[], filters: FilterConfig, dbcInfo: DbcInfo | null = null): CanFrame[] {
   const hasCanIdFilter = filters.canIds.length > 0;
@@ -210,7 +210,7 @@ export function filterFrames(frames: CanFrame[], filters: FilterConfig, dbcInfo:
 
 /**
  * Calculate frame statistics.
- * TypeScript implementation for base pelorus-inspector.
+ * Frame statistics for Pelorus Inspector (offline / viewer).
  */
 export function calculateFrameStats(frames: CanFrame[]): FrameStats {
   if (frames.length === 0) {
