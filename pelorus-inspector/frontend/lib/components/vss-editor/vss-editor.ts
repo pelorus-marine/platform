@@ -163,12 +163,16 @@ export class VssEditorElement extends HTMLElement {
 
   async handleNew(): Promise<void> {
     if (!this.api) return;
-    await this.api.clearVss(false);
-    await this.api.updateVssContent(EMPTY_VSS_TEMPLATE);
-    const snap = await this.api.getVssSnapshot();
-    appStore.set({ vssFile: null });
-    emitVssChanged({ action: 'new', snapshot: snap, filename: null });
-    this.applySnapshot(snap, null);
+    try {
+      await this.api.clearVss(false);
+      await this.api.updateVssContent(EMPTY_VSS_TEMPLATE);
+      const snap = await this.api.getVssSnapshot();
+      appStore.set({ vssFile: null });
+      emitVssChanged({ action: 'new', snapshot: snap, filename: null });
+      this.applySnapshot(snap, null);
+    } catch (e) {
+      this.toast(`New catalog failed: ${e}`, 'error');
+    }
   }
 
   async handleOpen(): Promise<void> {

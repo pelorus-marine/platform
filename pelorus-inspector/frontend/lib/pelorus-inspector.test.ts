@@ -170,6 +170,15 @@ describe('PelorusInspectorElement', () => {
       const liveTab = element.shadowRoot?.querySelector('[data-tab="live"]');
       expect(liveTab?.classList.contains('active')).toBe(true);
     });
+
+    it('should keep VSS toolbar wired after setConfig re-render', async () => {
+      const clearSpy = vi.spyOn(api, 'clearVss');
+      element.setConfig({ initialTab: 'vss' });
+      const newBtn = element.shadowRoot?.querySelector('#vssNewBtn') as HTMLButtonElement;
+      expect(newBtn).toBeTruthy();
+      newBtn.click();
+      await vi.waitFor(() => expect(clearSpy).toHaveBeenCalled());
+    });
   });
 });
 

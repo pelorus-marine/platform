@@ -199,6 +199,10 @@ export class PelorusInspectorElement extends HTMLElement {
     `;
     this.cacheElements();
     this.bindEvents();
+    // Recreated custom elements need API wiring again (setApi / registerExtension are not re-run).
+    if (this.api) {
+      this.setupComponents();
+    }
     this.switchTab(this.state.activeTab);
   }
 
