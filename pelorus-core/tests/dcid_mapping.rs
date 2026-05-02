@@ -2,9 +2,12 @@
 
 use pelorus_core::dcid::{
     DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_PELORUS_NETWORK_MANAGEMENT,
-    DCID_PELORUS_WAKE_UP_FRAME, Dcid, core_wire_numeric_id, dcid_from_pelorus_extension_wire,
+    DCID_PELORUS_WAKE_UP_FRAME, Dcid, WireDcidClass, classify_core_wire, core_wire_numeric_id,
+    dcid_from_pelorus_extension_wire,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
     pelorus_extension_wire_id,
+    protocol::DCID_REQUEST,
+    write_mdf4_pelorus_path,
 };
 
 #[test]
@@ -71,4 +74,38 @@ fn speed_through_water_distinct_from_sog() {
         std::mem::discriminant(&Dcid::GnssSpeedOverGround),
         std::mem::discriminant(&Dcid::SpeedThroughWater),
     );
+}
+
+#[test]
+fn classify_wire_distinguishes_protocol_and_signal_carriers() {
+    use pelorus_core::dcid::protocol::DCID_ADDRESS_CLAIMED;
+    assert_eq!(
+        classify_core_wire(DCID_ADDRESS_CLAIMED),
+        WireDcidClass::ProtocolControl
+    );
+    assert_eq!(
+        classify_core_wire(DCID_REQUEST),
+        WireDcidClass::ProtocolControl
+    );
+    assert_eq!(
+        classify_core_wire(0x0FF80),
+        WireDcidClass::PelorusExtension(Dcid::PelorusWakeUpFrame)
+    );
+    assert_eq!(
+        classify_core_wire(0xF004),
+        WireDcidClass::Application { wire: 0xF004 }
+    );
+}
+
+#[test]
+fn mdf4_channel_paths_match_implementation_plan() {
+    let mut buf = [0u8; 80];
+    let n = write_mdf4_pelorus_path(&Dcid::GnssLatitude, &mut buf).unwrap();
+    assert_eq!(&buf[..n], b"pelorus/GnssLatitude");
+    let n = write_mdf4_pelorus_path(&Dcid::EngineRpm(0), &mut buf).unwrap();
+    assert_eq!(&buf[..n], b"pelorus/EngineRpm_0");
+    let n = write_mdf4_pelorus_path(&Dcid::EngineRpm(12), &mut buf).unwrap();
+    assert_eq!(&buf[..n], b"pelorus/EngineRpm_12");
+    let n = write_mdf4_pelorus_path(&Dcid::DepthBelowKeel, &mut buf).unwrap();
+    assert_eq!(&buf[..n], b"pelorus/DepthBelowKeel");
 }
