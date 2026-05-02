@@ -91,4 +91,14 @@ mod tests {
         let b = encode_request_payload(dcid);
         assert_eq!(decode_request_payload(&b), Some(dcid));
     }
+
+    #[test]
+    fn j1939_pgns_from_07_section2_derive_to_wire_dcids() {
+        // PGN 61444 EEC1 — PF 0xF0, PS 0x04
+        assert_eq!(derive_dcid(0, 0, 0xF0, 0x04), 0xF004);
+        // PGN 65253 Engine Temperature 1 — PF 0xFE, PS 0xC5
+        assert_eq!(derive_dcid(0, 0, 0xFE, 0xC5), 0xFEC5);
+        // PGN 65256 Vehicle Heading — PF 0xFE, PS 0xE8
+        assert_eq!(derive_dcid(0, 0, 0xFE, 0xE8), 0xFEE8);
+    }
 }

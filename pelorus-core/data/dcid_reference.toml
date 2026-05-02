@@ -22,3 +22,13 @@ signals = ["PelorusNetworkManagement"]
 # J1939 PGN 61444 — Electronic Engine Controller 1 (**06** / catalog); template instance 0.
 wire = "0x0F004"
 signals = ["EngineRpm:0"]
+
+[[map]]
+# J1939 PGN 65253 — Engine Temperature 1 (**07** §2); template instance 0.
+wire = "0x0FEC5"
+signals = ["EngineCoolantTemp:0"]
+
+[[map]]
+# J1939 PGN 65256 — Vehicle Heading (**07** §2).
+wire = "0x0FEE8"
+signals = ["HeadingTrue"]

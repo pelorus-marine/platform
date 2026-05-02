@@ -1,9 +1,10 @@
 //! DCID helpers (always built when running `cargo test`).
 
 use pelorus_core::dcid::{
-    DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_PELORUS_NETWORK_MANAGEMENT,
-    DCID_PELORUS_WAKE_UP_FRAME, Dcid, PelorusCoreReferenceMap, WireDcidClass, classify_core_wire,
-    core_wire_numeric_id, dcid_from_pelorus_extension_wire,
+    DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1, DCID_J1939_ENGINE_TEMPERATURE_1,
+    DCID_J1939_VEHICLE_HEADING, DCID_PELORUS_NETWORK_MANAGEMENT, DCID_PELORUS_WAKE_UP_FRAME, Dcid,
+    PelorusCoreReferenceMap, WireDcidClass, classify_core_wire, core_wire_numeric_id,
+    dcid_from_pelorus_extension_wire,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
     pelorus_extension_wire_id,
     protocol::dcid_from_extended_id,
@@ -64,6 +65,14 @@ fn core_wire_numeric_id_matches_registry() {
         core_wire_numeric_id(Dcid::EngineRpm(2)),
         Some(DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1)
     );
+    assert_eq!(
+        core_wire_numeric_id(Dcid::HeadingTrue),
+        Some(DCID_J1939_VEHICLE_HEADING)
+    );
+    assert_eq!(
+        core_wire_numeric_id(Dcid::EngineCoolantTemp(1)),
+        Some(DCID_J1939_ENGINE_TEMPERATURE_1)
+    );
     assert_eq!(core_wire_numeric_id(Dcid::GnssLatitude), None);
     assert_eq!(core_wire_numeric_id(Dcid::SpeedThroughWater), None);
 }
@@ -107,6 +116,14 @@ fn reference_map_by_wire_and_extended_id() {
     assert_eq!(
         m.dcids_for_wire_dcid(DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1),
         &[Dcid::EngineRpm(0)][..]
+    );
+    assert_eq!(
+        m.dcids_for_wire_dcid(DCID_J1939_VEHICLE_HEADING),
+        &[Dcid::HeadingTrue][..]
+    );
+    assert_eq!(
+        m.dcids_for_wire_dcid(DCID_J1939_ENGINE_TEMPERATURE_1),
+        &[Dcid::EngineCoolantTemp(0)][..]
     );
     let ext = 0x18FF8003_u32;
     assert_eq!(dcid_from_extended_id(ext), DCID_PELORUS_WAKE_UP_FRAME);

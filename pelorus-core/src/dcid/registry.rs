@@ -22,6 +22,10 @@ pub const DCID_PELORUS_NETWORK_MANAGEMENT: u32 = 0x0FF81;
 /// (`specifications/core/06-signal-catalog.md` §7) cites `dcid: 0xF004` as the PGN shorthand for
 /// the same broadcast family; instance selection uses the binding table, not distinct DCID values.
 pub const DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1: u32 = 0xF004;
+/// J1939 **Engine Temperature 1** (PGN **65253**) — Pelorus wire DCID **`0xFEC5`** (**07** §2).
+pub const DCID_J1939_ENGINE_TEMPERATURE_1: u32 = 0xFEC5;
+/// J1939 **Vehicle Heading** (PGN **65256**) — Pelorus wire DCID **`0xFEE8`** (**07** §2).
+pub const DCID_J1939_VEHICLE_HEADING: u32 = 0xFEE8;
 
 use super::protocol::{
     DCID_ADDRESS_CLAIMED, DCID_REQUEST, DCID_TRANSPORT_CONNECTION, DCID_TRANSPORT_DATA,
@@ -121,6 +125,8 @@ pub fn core_wire_numeric_id(d: Dcid) -> Option<u32> {
         Dcid::PelorusWakeUpFrame => Some(DCID_PELORUS_WAKE_UP_FRAME),
         Dcid::PelorusNetworkManagement => Some(DCID_PELORUS_NETWORK_MANAGEMENT),
         Dcid::EngineRpm(_) => Some(DCID_J1939_ELECTRONIC_ENGINE_CONTROLLER_1),
+        Dcid::HeadingTrue => Some(DCID_J1939_VEHICLE_HEADING),
+        Dcid::EngineCoolantTemp(_) => Some(DCID_J1939_ENGINE_TEMPERATURE_1),
         _ => None,
     }
 }
