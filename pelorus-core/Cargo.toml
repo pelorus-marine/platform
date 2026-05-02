@@ -1,0 +1,29 @@
+[package]
+name = "pelorus-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87.0"
+license = "MIT OR Apache-2.0"
+description = "Pelorus Core integration — CAN FD, DCID, VDR, ECDIS own-ship (Pelorus-first; in-tree dbc-rs / mdf4-rs)"
+readme = "README.md"
+repository = "https://github.com/pelorus-marine/platform"
+
+[dependencies]
+dbc-rs = { path = "../dbc-rs", optional = true, default-features = false }
+mdf4-rs = { path = "../mdf4-rs", optional = true, default-features = false }
+embedded-can = { version = "0.4.1", optional = true }
+
+[features]
+default = ["std", "canbus", "vdr"]
+std = ["dbc-rs?/std", "mdf4-rs?/std"]
+semantics = []
+alloc = ["dbc-rs?/alloc"]
+canbus = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/alloc"]
+vdr = ["dep:mdf4-rs", "dep:dbc-rs", "std", "mdf4-rs/std", "mdf4-rs/dbc", "dbc-rs/std"]
+hw_test = []
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lints]
+workspace = true

@@ -1,7 +1,7 @@
 //! Pelorus **Stream** subsystem — Ethernet, non–safety-critical transport plane.
 //!
 //! Decoders and network stacks accumulate here behind feature flags.
-//! Semantic correlation surfaces through [`pelorus_semantics`].
+//! Semantic correlation surfaces through [`pelorus_core::CorrelationSlot`].
 //!
 //! **Pelorus State** lives in **`pelorus-state`** in the same workspace.
 

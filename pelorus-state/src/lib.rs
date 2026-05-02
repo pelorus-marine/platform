@@ -1,12 +1,12 @@
 //! Pelorus **State** subsystem — coordination, policy, and fusion over Core + Stream inputs.
 //!
-//! Lives in the **`platform`** workspace with **`pelorus-semantics`** and **`pelorus-stream`**.
+//! Lives in the **`platform`** workspace with **`pelorus-core`** and **`pelorus-stream`**.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
-use pelorus_semantics::CorrelationSlot;
+use pelorus_core::CorrelationSlot;
 
 #[cfg(feature = "stream")]
 pub use pelorus_stream::TelemetryEnvelope;
@@ -25,7 +25,7 @@ impl StateScaffold {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pelorus_semantics::SemanticPath;
+    use pelorus_core::SemanticPath;
 
     #[test]
     fn scaffold_sees_vessel_slot() {

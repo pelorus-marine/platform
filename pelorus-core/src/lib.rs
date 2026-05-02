@@ -1,7 +1,8 @@
-//! Pelorus **`pelorus-platform` crate**: **DCID** schema, optional **CAN bus** decode, optional **VDR**
+//! Pelorus **`pelorus-core`** Rust crate: **DCID** schema, optional **CAN bus** decode, optional **VDR**
 //! hooks, and **own-ship** snapshots for charting.
 //!
 //! **`pelorus-stream`** and **`pelorus-state`** are sibling crates under the **`platform/`** workspace root (`../`).
+//! Shared catalog correlation types live in **`correlation`** (no separate semantics crate).
 //!
 //! See the workspace **`README.md`** and [`ARCHITECTURE.md`] in this directory.
 //!
@@ -15,6 +16,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod correlation;
 #[cfg(feature = "canbus")]
 pub mod canbus;
 pub mod dcid;
@@ -24,6 +26,7 @@ pub mod semantics;
 #[cfg(feature = "vdr")]
 pub mod vdr;
 
+pub use correlation::{CorrelationSlot, SemanticPath};
 pub use ownship::snapshot::OwnShipSnapshot;
 pub use ownship::state::ShipState;
 #[cfg(feature = "semantics")]

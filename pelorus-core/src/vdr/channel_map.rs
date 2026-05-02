@@ -1,7 +1,7 @@
 //! MDF4 channel naming: `pelorus/<dcid>` convention from the Pelorus implementation plan.
 //!
 //! When **`semantics`** is enabled, [`correlation_for_dcid`](crate::semantics::correlation_for_dcid)
-//! supplies matching [`pelorus_semantics::CorrelationSlot`] values for gateways and Stream.
+//! supplies matching [`crate::CorrelationSlot`] values for gateways and Stream.
 
 use crate::dcid::Dcid;
 

@@ -1,11 +1,11 @@
-# Contributing — `pelorus-platform` crate
+# Contributing — `pelorus-core` crate
 
 From the **workspace root** (monorepo **`platform/`** directory):
 
 ```bash
 cargo fmt --all
-cargo clippy -p pelorus-platform --all-features
-cargo test -p pelorus-platform --all-features
+cargo clippy -p pelorus-core --all-features
+cargo test -p pelorus-core --all-features
 ```
 
 - **Safe Rust only** — no `unsafe` (workspace `[lints]` + `#![forbid(unsafe_code)]` on this crate)

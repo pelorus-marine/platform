@@ -1,16 +1,16 @@
-# pelorus-platform — architecture (Cargo package)
+# `pelorus-core` — architecture (Cargo package)
 
-This is the **`pelorus-platform`** Rust library (**`platform/pelorus-platform/`** in the monorepo) — Core CAN/VDR/chart glue. **Stream** and **State** live in **`../pelorus-stream/`** and **`../pelorus-state/`**, not modules here.
+This is the **`pelorus-core`** Rust library (**`platform/pelorus-core/`** in the repo) — Core CAN/VDR/chart-facing integration. **Stream** and **State** live in **`../pelorus-stream/`** and **`../pelorus-state/`**, not modules here.
+
+The **normative Pelorus Core** architecture lives under **`specifications/`**; this crate implements **Rust integration** aligned with it, not the prose spec itself.
 
 See workspace **`README.md`** at **`../README.md`** (`platform/` root).
 
 ## Scope (this crate)
 
-`pelorus-platform` (the package) is **Rust integration** — **not** the normative **Pelorus Core** subsystem from `specifications/`.
-
 - **`dcid/`** — Core-canonical [`Dcid`](src/dcid/registry.rs); map DBC lanes in `dcid::mapping`.
 - **`canbus/`** — `PelorusCanDecoder` + (std-only) frame scratch log; M7 builds drop `vdr`/`std`.
-- **`semantics`** (Cargo feature `semantics`) — [`correlation_for_dcid`](src/semantics.rs) → [`pelorus_semantics::CorrelationSlot`](../pelorus-semantics/README.md).
+- **`semantics`** (Cargo feature `semantics`) — [`correlation_for_dcid`](src/semantics.rs) → [`CorrelationSlot`](src/correlation.rs).
 - **`vdr/`** — MDF4 naming + `CanDbcLogger` glue (Linux / A55).
 - **`ownship/`** — `OwnShipSnapshot` for `pelorus-ecdis` via `From`.
 
@@ -28,10 +28,10 @@ See workspace **`README.md`** at **`../README.md`** (`platform/` root).
 ```mermaid
 flowchart TB
   subgraph mcu[M7]
-    PC_min[pelorus-platform minimal features]
+    PC_min[pelorus_core minimal features]
   end
   subgraph linux[Linux A55]
-    PC_full[pelorus-platform vdr etc]
+    PC_full[pelorus_core + vdr etc]
     PS[pelorus-stream]
     PSt[pelorus-state]
     UI[pelorus-ecdis / UI]

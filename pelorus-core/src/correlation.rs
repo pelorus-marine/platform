@@ -1,11 +1,12 @@
-//! Canonical path strings and correlation tags shared between transports.
+//! Catalog **semantic path** handles and **`Vessel.*`** correlation metadata shared with Stream payloads.
+//!
+//! Normative prose lives under **`specifications/`** — these types are transport-agnostic wrappers only.
 
 /// Borrowed **`Vessel.*`**-style semantic path (UTF-8).
 ///
-/// Validation rules match the evolving catalog in `specifications/`; this type does **not**
-/// parse paths — callers must uphold catalog spelling.
+/// This type does **not** parse paths; callers must uphold catalog spelling from **`specifications/`**.
 ///
-/// Examples: `"Vessel.Navigation.GNSS.Level1.Position.Latitude"`.
+/// Example: `"Vessel.Navigation.GNSS.Level1.Position.Latitude"`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
 pub struct SemanticPath<'a>(pub &'a str);
@@ -23,7 +24,7 @@ impl<'a> From<&'a str> for SemanticPath<'a> {
     }
 }
 
-/// Optional linkage from a telemetry sample to canonical catalog semantics.
+/// Optional linkage from a telemetry sample to catalog semantics.
 ///
 /// Stream payloads may attach this; gateways map DCID-bearing frames into the same shape.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

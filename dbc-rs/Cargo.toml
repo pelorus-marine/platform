@@ -73,3 +73,6 @@ criterion = { version = "0.8.2", default-features = false }
 name = "parse_bench"
 harness = false
 required-features = ["std"]
+
+[lints]
+workspace = true

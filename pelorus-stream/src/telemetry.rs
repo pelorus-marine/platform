@@ -1,6 +1,6 @@
 //! Stream **telemetry envelope**: payload bytes + optional semantic correlation.
 
-use pelorus_semantics::CorrelationSlot;
+use pelorus_core::CorrelationSlot;
 
 /// Telemetry frame as seen after transport decryption (ordering TBD — placeholder).
 ///
@@ -35,7 +35,7 @@ impl<'a> TelemetryEnvelope<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pelorus_semantics::SemanticPath;
+    use pelorus_core::SemanticPath;
 
     #[test]
     fn envelope_can_carry_semantic_slot() {

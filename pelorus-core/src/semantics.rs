@@ -1,10 +1,10 @@
-//! Optional bridge from Core [`crate::dcid::Dcid`] to [`pelorus_semantics`] types.
+//! Optional bridge from Core [`crate::dcid::Dcid`] to [`crate::correlation`] types.
 //!
 //! Paths are **illustrative** defaults for tooling and Stream correlation until a generated catalog
 //! is wired in (`specifications` / `Vessel.*`).
 
+use crate::correlation::{CorrelationSlot, SemanticPath};
 use crate::dcid::Dcid;
-use pelorus_semantics::{CorrelationSlot, SemanticPath};
 
 /// Recommended constant-time correlation for MDF4 exporters, gateways, and Stream metadata.
 ///
@@ -40,7 +40,7 @@ fn slot(path: &'static str) -> CorrelationSlot<'static> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pelorus_semantics::SemanticPath;
+    use crate::correlation::SemanticPath;
 
     #[test]
     fn gnss_lat_matches_semantics_path() {

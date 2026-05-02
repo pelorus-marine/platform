@@ -1,12 +1,13 @@
 [workspace]
 resolver = "2"
 members = [
-  "pelorus-semantics",
+  "dbc-rs",
+  "mdf4-rs",
   "pelorus-stream",
   "pelorus-state",
-  "pelorus-platform",
+  "pelorus-core",
 ]
-default-members = ["pelorus-platform"]
+default-members = ["pelorus-core"]
 
 # Safe Rust only for every member that sets `[lints] workspace = true`.
 [workspace.lints.rust]

@@ -1,6 +1,6 @@
 //! DCID helpers (always built when running `cargo test`).
 
-use pelorus_platform::dcid::{
+use pelorus_core::dcid::{
     Dcid,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
 };
