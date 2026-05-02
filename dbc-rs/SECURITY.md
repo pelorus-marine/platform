@@ -1,7 +1,7 @@
 # Security Audit Report
 
 **Date**: 2025-12-29
-**Version**: 0.4.0
+**Version**: 0.5.0
 **Overall Security Rating**: 🟢 **EXCELLENT** (9.5/10)
 
 ## Executive Summary

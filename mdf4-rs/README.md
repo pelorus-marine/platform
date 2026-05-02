@@ -2,6 +2,8 @@
 
 A safe, efficient Rust library for reading and writing ASAM MDF 4 (Measurement Data Format) files.
 
+Crates.io releases are published from the **[`pelorus-marine/platform`](https://github.com/pelorus-marine/platform)** monorepo (**`mdf4-rs/`** subdirectory). Report issues and contribute there for the Pelorus-aligned tree.
+
 [![Crates.io](https://img.shields.io/crates/v/mdf4-rs.svg)](https://crates.io/crates/mdf4-rs)
 [![Documentation](https://docs.rs/mdf4-rs/badge.svg)](https://docs.rs/mdf4-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
@@ -19,7 +21,7 @@ A safe, efficient Rust library for reading and writing ASAM MDF 4 (Measurement D
 
 ```toml
 [dependencies]
-mdf4-rs = "0.2"
+mdf4-rs = "0.3"
 ```
 
 ### Reading
@@ -67,7 +69,7 @@ let mdf_bytes = logger.finalize()?;
 
 ```toml
 [dependencies]
-mdf4-rs = { version = "0.2", default-features = false, features = ["alloc"] }
+mdf4-rs = { version = "0.3", default-features = false, features = ["alloc"] }
 ```
 
 See [`examples/`](./examples/) for complete working examples:

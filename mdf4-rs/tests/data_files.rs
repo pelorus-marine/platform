@@ -17,7 +17,7 @@ fn test_data_path(filename: &str) -> String {
 // ============================================================================
 
 /// Minimal MDF4 where `##DG.data_block_addr` points at `##HL`, which precedes `##DL` /
-/// `##DT` in the payload chain (see [mdf4-rs#4](https://github.com/reneherrero/mdf4-rs/pull/4)).
+/// `##DT` in the payload chain (see channel-hierarchy **`##HL`** regression coverage shipped with **`mdf4-rs`**).
 /// Opening the file succeeds; collecting DT fragments for samples hits `##HL` and must skip it.
 #[test]
 fn sample_with_hl_in_data_chain_loads() {

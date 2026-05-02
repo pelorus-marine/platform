@@ -36,7 +36,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! mdf4-rs = { version = "0.1", default-features = false, features = ["alloc"] }
+//! mdf4-rs = { version = "0.3", default-features = false, features = ["alloc"] }
 //! ```
 //!
 //! With `alloc` only, you can:

@@ -8,7 +8,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! mdf4-rs = { version = "0.1", features = ["dbc", "can"] }
+//! mdf4-rs = { version = "0.3", features = ["dbc", "can"] }
 //! ```
 //!
 //! # Running this example

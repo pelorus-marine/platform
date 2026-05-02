@@ -1,11 +1,11 @@
 [package]
 name = "dbc-rs"
-version = "0.4.3"
+version = "0.5.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 authors = ["dbc-rs contributors"]
-repository = "https://github.com/reneherrero/dbc-rs"
-homepage = "https://github.com/reneherrero/dbc-rs"
+repository = "https://github.com/pelorus-marine/platform"
+homepage = "https://github.com/pelorus-marine/platform/tree/main/dbc-rs"
 rust-version = "1.85.0"
 readme = "README.md"
 description = "Database CAN (DBC) parsing and editing library"

@@ -3,6 +3,12 @@
 **Pelorus first. Period.**  
 This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog correlation types), Stream, State, aligned with **`specifications/`**. In-tree **`dbc-rs`** and **`mdf4-rs`** exist to **serve Pelorus** (CAN/DBC, MDF4/VDR)—not as ends in themselves.
 
+## Principles
+
+- **By sailors, for sailors** — Bridge workflows, regulation, and life at sea set the bar; generic lab or automotive defaults do not.
+- **Pelorus first** — Product direction and **`specifications/`** define what ships first. Subtrees and crates.io are downstream of that.
+- **Embedded first** — **`no_std`**, bounded memory, and core trust boundaries (e.g. M-class vs Linux) shape APIs and CI from the start—not as a later retrofit.
+
 ## Repository
 
 - **Origin:** `git@github.com:pelorus-marine/platform.git`
@@ -26,7 +32,9 @@ git subtree pull --prefix dbc-rs https://github.com/reneherrero/dbc-rs.git main 
 git subtree pull --prefix mdf4-rs https://github.com/reneherrero/mdf4-rs.git main --squash
 ```
 
-Publishing **`dbc-rs`** / **`mdf4-rs`** to crates.io from this tree is supported for the wider ecosystem; **Pelorus** priorities still come first here.
+Publishing **`dbc-rs`** / **`mdf4-rs`** to crates.io from this tree is supported for the wider ecosystem; **Pelorus** priorities still come first here. Published crate **`repository`** links point at **[pelorus-marine/platform](https://github.com/pelorus-marine/platform)** (subdir paths on GitHub denote each crate).
+
+Separate **`pelorus-marine/dbc-rs`** / **`pelorus-marine/mdf4-rs`** GitHub repositories are **optional** (ecosystem and branding); **`pelorus-core`** integration assumes **only** this workspace—in-tree crates and subtree policy—without requiring standalone org-only library repos.
 
 Further context: normative specs stay in `specifications/`, the ECDIS app in `ecdis/`.
 

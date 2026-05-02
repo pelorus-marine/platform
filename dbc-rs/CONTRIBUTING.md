@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to dbc-rs! This document provides guidelines and instructions for contributing to the project.
 
+The maintained copy for the Pelorus ecosystem lives in the **[pelorus-marine/platform](https://github.com/pelorus-marine/platform)** repository under **`dbc-rs/`**. Prefer opening changes and issues there so **`pelorus-core`** and workspace CI stay in sync.
+
 ## Code of Conduct
 
 This project adheres to a code of conduct that all contributors are expected to follow. Please be respectful and constructive in all interactions.

@@ -1,0 +1,60 @@
+# Layout mirrors <https://github.com/pelorus-marine/ecdis/.github/workflows/ci.yml>:
+# checkout → pinned toolchain → test / clippy / fmt / doc. No ECDIS/UI system deps here.
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Test (workspace, all features)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.87.0
+      - run: cargo test --workspace --all-features --verbose
+
+  pelorus-core-canbus:
+    name: Pelorus Core (canbus + alloc, no defaults)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.87.0
+      - run: cargo check -p pelorus-core --no-default-features --features canbus,alloc --verbose
+
+  clippy:
+    name: Clippy (workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.87.0
+        with:
+          components: clippy
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.87.0
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  doc:
+    name: Docs (workspace)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.87.0
+      - env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --all-features

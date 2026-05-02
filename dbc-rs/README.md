@@ -2,6 +2,8 @@
 
 A lightweight Rust library for seamlessly parsing and editing DBC (CAN Database) files, with robust support for encoding and decoding messages and signals.
 
+Crates.io releases are published from the **[`pelorus-marine/platform`](https://github.com/pelorus-marine/platform)** monorepo (**`dbc-rs/`** subdirectory). Report issues and contribute there for the Pelorus-aligned tree.
+
 [![Crates.io](https://img.shields.io/crates/v/dbc-rs.svg)](https://crates.io/crates/dbc-rs)
 [![Documentation](https://docs.rs/dbc-rs/badge.svg)](https://docs.rs/dbc-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
@@ -19,7 +21,7 @@ A lightweight Rust library for seamlessly parsing and editing DBC (CAN Database)
 
 ```toml
 [dependencies]
-dbc-rs = "0.4"
+dbc-rs = "0.5"
 ```
 
 ### Decode CAN Frames
@@ -55,7 +57,7 @@ let payload = dbc.encode(0x100, &[
 
 ```toml
 [dependencies]
-dbc-rs = { version = "0.4", default-features = false, features = ["heapless"] }
+dbc-rs = { version = "0.5", default-features = false, features = ["heapless"] }
 ```
 
 See [`examples/`](./examples/) for complete working examples:
