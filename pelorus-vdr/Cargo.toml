@@ -1,0 +1,22 @@
+[package]
+name = "pelorus-vdr"
+version = "0.0.1"
+edition = "2024"
+rust-version = "1.88.0"
+license = "MIT OR Apache-2.0"
+description = "Pelorus voyage data recorder scaffold — MDF4 logging on A55 Linux (Phase 3)."
+readme = "README.md"
+publish = false
+
+[[bin]]
+name = "pelorus-vdr"
+path = "src/main.rs"
+
+[dependencies]
+pelorus-core = { path = "../pelorus-core", default-features = false, features = ["std", "vdr"] }
+tokio = { version = "1.52", features = ["rt-multi-thread", "macros", "time"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[lints]
+workspace = true

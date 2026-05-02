@@ -19,3 +19,11 @@ fn empty_map_returns_no_signals() {
     let map = EmptyDbcMap;
     assert!(map.dcids_for_message(DbcMessageId(0x123)).is_empty());
 }
+
+#[test]
+fn pelorus_extension_dcids_distinct() {
+    assert_ne!(
+        std::mem::discriminant(&Dcid::PelorusWakeUpFrame),
+        std::mem::discriminant(&Dcid::PelorusNetworkManagement),
+    );
+}

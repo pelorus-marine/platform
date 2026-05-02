@@ -30,5 +30,7 @@ pub fn mdf4_channel_for_dcid(d: Dcid) -> String {
         Dcid::DepthBelowKeel => format!("{MDF4_GROUP_PREFIX}/DepthBelowKeel"),
         Dcid::WindSpeedApparent => format!("{MDF4_GROUP_PREFIX}/WindSpeedApparent"),
         Dcid::WindAngleApparent => format!("{MDF4_GROUP_PREFIX}/WindAngleApparent"),
+        Dcid::PelorusWakeUpFrame => format!("{MDF4_GROUP_PREFIX}/PelorusWakeUpFrame"),
+        Dcid::PelorusNetworkManagement => format!("{MDF4_GROUP_PREFIX}/PelorusNetworkManagement"),
     }
 }

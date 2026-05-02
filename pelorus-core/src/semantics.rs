@@ -33,6 +33,8 @@ pub fn correlation_for_dcid(d: Dcid) -> CorrelationSlot<'static> {
         Dcid::DepthBelowKeel => slot("Vessel.Navigation.Depth.Soundings.UnderKeel"),
         Dcid::WindSpeedApparent => slot("Vessel.Environment.Wind.Apparent.Speed"),
         Dcid::WindAngleApparent => slot("Vessel.Environment.Wind.Apparent.Angle"),
+        Dcid::PelorusWakeUpFrame => slot("Pelorus.Core.Power.WakeUpFrame"),
+        Dcid::PelorusNetworkManagement => slot("Pelorus.Core.Power.NetworkManagement"),
     }
 }
 
@@ -61,5 +63,15 @@ mod tests {
     fn engine_rpm_placeholder_path() {
         let c = correlation_for_dcid(Dcid::EngineRpm(3));
         assert!(c.vessel.is_some());
+    }
+
+    #[test]
+    fn pelorus_wire_frames_have_paths() {
+        assert!(correlation_for_dcid(Dcid::PelorusWakeUpFrame)
+            .vessel
+            .is_some());
+        assert!(correlation_for_dcid(Dcid::PelorusNetworkManagement)
+            .vessel
+            .is_some());
     }
 }

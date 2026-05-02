@@ -49,4 +49,10 @@ pub enum Dcid {
     WindSpeedApparent,
     /// Apparent wind angle (degrees).
     WindAngleApparent,
+
+    // Pelorus extension wire frames (numeric IDs in `specifications/core/07-dcid-registry.md` §1)
+    /// DCID **0x0FF80** — wake-up frame (PNC mask).
+    PelorusWakeUpFrame,
+    /// DCID **0x0FF81** — network management / power state.
+    PelorusNetworkManagement,
 }

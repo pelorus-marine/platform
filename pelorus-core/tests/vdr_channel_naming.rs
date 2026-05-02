@@ -10,4 +10,8 @@ fn mdf4_gnss_latitude_name() {
         mdf4_channel_for_dcid(Dcid::GnssLatitude),
         "pelorus/GnssLatitude"
     );
+    assert_eq!(
+        mdf4_channel_for_dcid(Dcid::PelorusWakeUpFrame),
+        "pelorus/PelorusWakeUpFrame"
+    );
 }

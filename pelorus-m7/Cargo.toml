@@ -1,0 +1,18 @@
+[package]
+name = "pelorus-m7"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88.0"
+license = "MIT OR Apache-2.0"
+description = "Pelorus Cortex-M7 firmware scaffold — CAN FD decode (Phase 2); never enables pelorus-core/vdr."
+readme = "README.md"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+pelorus-core = { path = "../pelorus-core", default-features = false, features = ["canbus_heapless"] }
+
+[lints]
+workspace = true

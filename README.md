@@ -43,6 +43,8 @@ Rust **1.88.x** is pinned in **`rust-toolchain.toml`** (required for **Pelorus I
 
 These directories are **squashed subtree** snapshots for Pelorus (**`pelorus-core`** uses **`path`** deps). **`main` development happens only in this repository.**
 
+Optional standalone GitHub org repos (**`pelorus-marine/dbc-rs`**, **`pelorus-marine/mdf4-rs`**) remain **deferred** unless crates.io or branding policy requires them — subtrees in **this** workspace stay authoritative (see **`PELORUS_IMPLEMENTATION_PLAN.md`** Phase 0.1–0.2 where that file is available in your checkout).
+
 The original standalone repos **[`reneherrero/dbc-rs`](https://github.com/reneherrero/dbc-rs)** and **[`reneherrero/mdf4-rs`](https://github.com/reneherrero/mdf4-rs)** are **archived (read-only)**; do not subtree-pull from them for new work—they no longer receive changes. Historical context only.
 
 Published **`repository`** URLs on crates.io point at **`pelorus-marine/platform`** ([`dbc-rs` tree](https://github.com/pelorus-marine/platform/tree/main/dbc-rs), [`mdf4-rs` tree](https://github.com/pelorus-marine/platform/tree/main/mdf4-rs)).
