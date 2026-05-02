@@ -3,6 +3,7 @@ resolver = "2"
 members = [
   "dbc-rs",
   "mdf4-rs",
+  "pelorus-inspector",
   "pelorus-stream",
   "pelorus-state",
   "pelorus-core",

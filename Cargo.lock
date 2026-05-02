@@ -330,6 +330,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "pelorus-inspector"
+version = "0.1.0"
+
+[[package]]
 name = "pelorus-state"
 version = "0.1.0"
 dependencies = [

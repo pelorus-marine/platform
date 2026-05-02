@@ -1,0 +1,18 @@
+[package]
+name = "pelorus-inspector"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.87.0"
+license = "MIT OR Apache-2.0"
+description = "Pelorus Inspector — signal and wire inspection (CAN, MDF4, Pelorus); desktop tooling scaffold"
+readme = "README.md"
+repository = "https://github.com/pelorus-marine/platform"
+keywords = ["pelorus", "can", "mdf4", "dbc", "marine"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "pelorus-inspector"
+path = "src/main.rs"
+
+[lints]
+workspace = true

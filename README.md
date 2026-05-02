@@ -47,6 +47,7 @@ Further context: normative specs stay in `specifications/`, the ECDIS app in `ec
 | **`pelorus-core/`** | **Package `pelorus-core`** — Pelorus CAN FD / DCID / VDR / own-ship; `SemanticPath` / `CorrelationSlot` |
 | **`pelorus-stream/`** | Stream telemetry envelope + future wire decoders |
 | **`pelorus-state/`** | State / fusion hooks over Core correlation (+ optional `stream`) |
+| **`pelorus-inspector/`** | Desktop CAN / MDF4 / signal inspection (**CLI scaffold**); successor to archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer) |
 | **`dbc-rs/`** | DBC/CAN substrate (was subtree from archived [`reneherrero/dbc-rs`](https://github.com/reneherrero/dbc-rs)) |
 | **`mdf4-rs/`** | MDF4 substrate (was subtree from archived [`reneherrero/mdf4-rs`](https://github.com/reneherrero/mdf4-rs)) |
 
