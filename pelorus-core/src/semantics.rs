@@ -14,8 +14,12 @@ pub fn correlation_for_dcid(d: Dcid) -> CorrelationSlot<'static> {
     match d {
         Dcid::GnssLatitude => slot("Vessel.Navigation.GNSS.Level1.Position.Latitude"),
         Dcid::GnssLongitude => slot("Vessel.Navigation.GNSS.Level1.Position.Longitude"),
-        Dcid::GnssSpeedOverGround => slot("Vessel.Navigation.GNSS.Level1.Navigation.SpeedOverGround"),
-        Dcid::GnssCourseOverGround => slot("Vessel.Navigation.GNSS.Level1.Navigation.CourseOverGround"),
+        Dcid::GnssSpeedOverGround => {
+            slot("Vessel.Navigation.GNSS.Level1.Navigation.SpeedOverGround")
+        }
+        Dcid::GnssCourseOverGround => {
+            slot("Vessel.Navigation.GNSS.Level1.Navigation.CourseOverGround")
+        }
         Dcid::HeadingTrue => slot("Vessel.Navigation.HeadingTrue"),
         Dcid::HeadingMagnetic => slot("Vessel.Navigation.HeadingMagnetic"),
         Dcid::RateOfTurn => slot("Vessel.Navigation.RateOfTurn"),

@@ -98,6 +98,12 @@ impl BitTimingBuilder {
     }
 }
 
+impl Default for BitTimingBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::BitTimingBuilder;
@@ -133,11 +139,5 @@ mod tests {
     fn test_bit_timing_builder_default() {
         let bt = BitTimingBuilder::default().build().unwrap();
         assert!(bt.is_empty());
-    }
-}
-
-impl Default for BitTimingBuilder {
-    fn default() -> Self {
-        Self::new()
     }
 }

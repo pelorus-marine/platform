@@ -145,7 +145,7 @@ mod tests {
             },
             next_fh_addr: 0x1000,
             comment_addr: 0x2000,
-            time_ns: 1704067200_000_000_000, // 2024-01-01 00:00:00 UTC
+            time_ns: 1_704_067_200_000_000_000, // 2024-01-01 00:00:00 UTC
             tz_offset_min: 60,
             dst_offset_min: 60,
             time_flags: 0x03,

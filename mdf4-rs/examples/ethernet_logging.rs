@@ -227,7 +227,7 @@ fn create_ipv4_packet(src_mac: [u8; 6], dst_mac: [u8; 6], payload_size: usize) -
     frame.extend_from_slice(&[192, 168, 1, 1]); // Dest IP
 
     // Payload
-    frame.extend(std::iter::repeat(0xAA).take(payload_size));
+    frame.extend(std::iter::repeat_n(0xAA, payload_size));
 
     frame
 }

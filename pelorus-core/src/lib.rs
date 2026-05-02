@@ -16,9 +16,9 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
-pub mod correlation;
 #[cfg(feature = "canbus")]
 pub mod canbus;
+pub mod correlation;
 pub mod dcid;
 pub mod ownship;
 #[cfg(feature = "semantics")]

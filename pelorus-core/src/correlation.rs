@@ -41,9 +41,7 @@ impl<'a> CorrelationSlot<'a> {
 
     /// Attach only a catalog path (most common Pelorus correlation).
     pub const fn vessel_only(path: SemanticPath<'a>) -> Self {
-        Self {
-            vessel: Some(path),
-        }
+        Self { vessel: Some(path) }
     }
 }
 
@@ -54,7 +52,10 @@ mod tests {
     #[test]
     fn semantic_path_round_trips_str() {
         let p = SemanticPath::from("Vessel.Navigation.GNSS.Level1.Position.Latitude");
-        assert_eq!(p.as_str(), "Vessel.Navigation.GNSS.Level1.Position.Latitude");
+        assert_eq!(
+            p.as_str(),
+            "Vessel.Navigation.GNSS.Level1.Position.Latitude"
+        );
     }
 
     #[test]

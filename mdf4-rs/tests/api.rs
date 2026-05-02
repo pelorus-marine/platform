@@ -105,7 +105,7 @@ fn writer_write_records() -> Result<()> {
     })?;
 
     writer.start_data_block_for_cg(&cg_id, 0)?;
-    let recs = vec![
+    let recs = [
         vec![DecodedValue::UnsignedInteger(1)],
         vec![DecodedValue::UnsignedInteger(2)],
     ];
@@ -135,9 +135,11 @@ fn writer_write_records() -> Result<()> {
 
 #[test]
 fn decode_channel_value_integer() {
-    let mut ch = ChannelBlock::default();
-    ch.data_type = DataType::UnsignedIntegerLE;
-    ch.bit_count = 16;
+    let ch = ChannelBlock {
+        data_type: DataType::UnsignedIntegerLE,
+        bit_count: 16,
+        ..ChannelBlock::default()
+    };
     let record = [0x34, 0x12];
     match decode_channel_value(&record, 0, &ch).unwrap() {
         DecodedValue::UnsignedInteger(v) => assert_eq!(v, 0x1234),

@@ -376,6 +376,7 @@ impl Default for EventBlock {
 mod tests {
     use super::*;
 
+    #[allow(clippy::too_many_arguments)]
     fn create_ev_bytes(
         event_type: u8,
         sync_type: u8,

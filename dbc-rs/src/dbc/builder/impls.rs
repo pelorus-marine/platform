@@ -480,6 +480,12 @@ impl DbcBuilder {
     }
 }
 
+impl Default for DbcBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(clippy::float_cmp)]
@@ -726,11 +732,5 @@ SG_MUL_VAL_ 500 SignalA Mux1 0-5,10-15 ;
         assert_eq!(new_entry.signal_name(), "SignalA");
         assert_eq!(new_entry.value_ranges().len(), 1);
         assert_eq!(new_entry.value_ranges()[0], (20, 25));
-    }
-}
-
-impl Default for DbcBuilder {
-    fn default() -> Self {
-        Self::new()
     }
 }

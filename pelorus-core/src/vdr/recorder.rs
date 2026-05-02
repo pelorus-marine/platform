@@ -19,7 +19,9 @@ impl VdrPipelineMarker {
     /// Builder entrypoint matching MDF4 ergonomics (`CanDbcLogger::builder`).
     ///
     /// Returns `mdf4_rs::Error` if the MDF4 internals reject configuration.
-    pub fn build_example_logger(dbc: Dbc) -> mdf4_rs::Result<CanDbcLogger<mdf4_rs::writer::VecWriter>> {
+    pub fn build_example_logger(
+        dbc: Dbc,
+    ) -> mdf4_rs::Result<CanDbcLogger<mdf4_rs::writer::VecWriter>> {
         CanDbcLogger::builder(dbc).build()
     }
 }

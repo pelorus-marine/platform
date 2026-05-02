@@ -1,8 +1,8 @@
 //! DCID helpers (always built when running `cargo test`).
 
 use pelorus_core::dcid::{
-    Dcid,
     mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap},
+    Dcid,
 };
 
 #[test]
@@ -16,6 +16,6 @@ fn dcid_orders_in_hash_map() {
 
 #[test]
 fn empty_map_returns_no_signals() {
-    let map = EmptyDbcMap::default();
+    let map = EmptyDbcMap;
     assert!(map.dcids_for_message(DbcMessageId(0x123)).is_empty());
 }

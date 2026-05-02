@@ -484,7 +484,7 @@ mod tests {
         // EtherType (IPv4)
         frame.extend_from_slice(&[0x08, 0x00]);
         // Payload
-        frame.extend(core::iter::repeat(0xAA).take(payload_len));
+        frame.extend(core::iter::repeat_n(0xAA, payload_len));
         frame
     }
 
