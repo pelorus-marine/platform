@@ -1,12 +1,11 @@
 //! Pelorus **Data Channel ID** surface: compiler-enforced schema and DBC translation hooks.
 
 pub mod mapping;
-
-pub use mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap, PelorusCoreReferenceMap};
 pub mod protocol;
 pub mod registry;
 pub mod wire;
 
+pub use mapping::{DbcMessageId, DcidFromDbc, EmptyDbcMap, PelorusCoreReferenceMap};
 pub use protocol::{
     DCID_ADDRESS_CLAIMED, DCID_REQUEST, DCID_TRANSPORT_CONNECTION, DCID_TRANSPORT_DATA,
     dcid_from_extended_id, decode_request_payload, derive_dcid, encode_request_payload,
