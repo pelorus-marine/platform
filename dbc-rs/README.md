@@ -4,6 +4,10 @@ A lightweight Rust library for seamlessly parsing and editing DBC (CAN Database)
 
 Crates.io releases are published from the **[`pelorus-marine/platform`](https://github.com/pelorus-marine/platform)** monorepo (**`dbc-rs/`** subdirectory). Report issues and contribute there for the Pelorus-aligned tree.
 
+### Pelorus curation and upstream lineage
+
+**[Pelorus Marine](https://github.com/pelorus-marine)** curates this tree for the full Pelorus stack. The crates.io package name **`dbc-rs`** is **unchanged** for semver continuity. Earlier standalone development and contributors are **upstream lineage** — acknowledged with gratitude; see **[`CHANGELOG.md`](CHANGELOG.md)** and **[`../CONTRIBUTORS.md`](../CONTRIBUTORS.md)**.
+
 [![Crates.io](https://img.shields.io/crates/v/dbc-rs.svg)](https://crates.io/crates/dbc-rs)
 [![Documentation](https://docs.rs/dbc-rs/badge.svg)](https://docs.rs/dbc-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)

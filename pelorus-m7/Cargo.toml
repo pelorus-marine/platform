@@ -4,6 +4,7 @@ version = "0.0.1"
 edition = "2024"
 rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
+authors = ["Pelorus Marine contributors <https://github.com/pelorus-marine>"]
 description = "Pelorus Cortex-M7 firmware scaffold — CAN FD decode (Phase 2); never enables pelorus-core/vdr."
 readme = "README.md"
 publish = false

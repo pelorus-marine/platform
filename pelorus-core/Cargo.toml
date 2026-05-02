@@ -4,6 +4,7 @@ version = "0.1.1"
 edition = "2024"
 rust-version = "1.88.0"
 license = "MIT OR Apache-2.0"
+authors = ["Pelorus Marine contributors <https://github.com/pelorus-marine>"]
 description = "Pelorus Core integration — CAN FD, DCID, VDR, ECDIS own-ship (Pelorus-first; in-tree dbc-rs / mdf4-rs)"
 readme = "README.md"
 repository = "https://github.com/pelorus-marine/platform"

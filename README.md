@@ -7,6 +7,9 @@ This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog
 
 - **By sailors, for sailors** — Bridge workflows, regulation, and life at sea set the bar; generic lab or automotive defaults do not.
 - **Pelorus first** — Product direction and **`specifications/`** define what ships first. Subtrees and crates.io are downstream of that.
+- **Open, transparent, community** — Full stack, inspectable source, public collaboration; credits and policy in **[`CONTRIBUTORS.md`](CONTRIBUTORS.md)**.
+- **Non-commercial** — This open-source initiative is **not** aimed at commercialization; it exists for **public, safety-aware** maritime software.
+- **Rust** — The **supported** implementation language for Pelorus crates here is **Rust**, with **maximum practical safety** (`#![forbid(unsafe_code)]` where workspace lint policy applies).
 - **Embedded-first** — On-device code paths define trust and capacity budgets; see [Embedded-first](#embedded-first) below.
 
 ## Embedded-first

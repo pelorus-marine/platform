@@ -4,6 +4,10 @@ A safe, efficient Rust library for reading and writing ASAM MDF 4 (Measurement D
 
 Crates.io releases are published from the **[`pelorus-marine/platform`](https://github.com/pelorus-marine/platform)** monorepo (**`mdf4-rs/`** subdirectory). Report issues and contribute there for the Pelorus-aligned tree.
 
+### Pelorus curation and upstream lineage
+
+**[Pelorus Marine](https://github.com/pelorus-marine)** curates this tree for the full Pelorus stack. The crates.io package name **`mdf4-rs`** is **unchanged** for semver continuity. Earlier standalone development and contributors are **upstream lineage** — acknowledged with gratitude; see **[`CHANGELOG.md`](CHANGELOG.md)** and **[`../CONTRIBUTORS.md`](../CONTRIBUTORS.md)**.
+
 [![Crates.io](https://img.shields.io/crates/v/mdf4-rs.svg)](https://crates.io/crates/mdf4-rs)
 [![Documentation](https://docs.rs/mdf4-rs/badge.svg)](https://docs.rs/mdf4-rs)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)

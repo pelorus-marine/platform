@@ -12,6 +12,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: "1.88.0"
 
 jobs:
   benchmark-compare:
@@ -23,8 +24,10 @@ jobs:
         with:
           fetch-depth: 0  # Need full history for baseline comparison
 
-      - name: Setup Rust toolchain (stable)
-        uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
 
       - name: Install critcmp
         run: cargo install critcmp --locked
