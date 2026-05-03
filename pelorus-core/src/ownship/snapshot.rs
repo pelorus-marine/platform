@@ -2,7 +2,7 @@
 
 /// ECDIS-facing snapshot: map directly from decoded **Pelorus DCIDs**.
 ///
-/// Integrators convert into [`pelorus_ecdis::OwnShip`] via `From`/`Into` in
+/// Integrators convert into `pelorus_ecdis::OwnShip` via `From`/`Into` in
 /// **`ecdis/pelorus-ecdis/src/own_ship.rs`** (combined Pelorus checkout: `../../ecdis/pelorus-ecdis/src/own_ship.rs`
 /// relative to this crate).
 #[derive(Debug, Clone, PartialEq, Default)]
