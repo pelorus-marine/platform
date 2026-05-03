@@ -13,7 +13,7 @@ This project adheres to a code of conduct that all contributors are expected to 
 ### Prerequisites
 
 - Familiarity with Rust and the MDF4 file format
-- Latest stable release of Rust (MSRV: 1.87.0)
+- Latest stable release of Rust (MSRV: 1.90.0)
 - Code coverage is done with `cargo-llvm-cov`
 
 ### Setting Up the Development Environment
@@ -80,7 +80,7 @@ cargo clippy --no-default-features --features alloc --lib -- -D warnings
 - **Tests**: Must pass with all features enabled
 - **Compilation**: Must compile with `alloc` only (no_std compatible)
 - **Coverage**: Minimum 80%
-- **MSRV**: Must work with Rust 1.87.0
+- **MSRV**: Must work with Rust 1.90.0
 
 ### Coding Standards
 

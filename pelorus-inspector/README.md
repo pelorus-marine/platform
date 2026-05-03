@@ -58,7 +58,7 @@ Options:
 ### All targets
 
 - **Node.js 20+** (frontend toolchain)  
-- **Rust** matching `../rust-toolchain.toml` (currently **1.88.x** for Tauri / dependency resolution)  
+- **Rust** matching `../rust-toolchain.toml` (currently **1.90.x** for Tauri / dependency resolution)  
 
 ### Linux (Debian-style)
 

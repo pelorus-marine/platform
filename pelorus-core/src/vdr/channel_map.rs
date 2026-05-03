@@ -12,7 +12,7 @@ pub const MDF4_GROUP_PREFIX: &str = "pelorus";
 ///
 /// Examples: `pelorus/GnssLatitude`, `pelorus/EngineRpm_0`.
 ///
-/// Delegates to [`mdf4_pelorus_path_string`](crate::dcid::mdf4_pelorus_path_string) so naming stays
+/// Delegates to [`mdf4_pelorus_path_string`] so naming stays
 /// aligned with [`crate::dcid::write_mdf4_pelorus_path`] (`no_std`-friendly paths use that API).
 pub fn mdf4_channel_for_dcid(d: Dcid) -> std::string::String {
     mdf4_pelorus_path_string(&d)

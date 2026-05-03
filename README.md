@@ -40,7 +40,7 @@ Concretely:
 2. **Member subfolders only** — Every Rust package lives in its **own subdirectory** alongside this `Cargo.toml` and is listed under `[workspace].members`. The Core integration library (Cargo package **`pelorus-core`**) lives under **`pelorus-core/`**.
 3. **Safe Rust only** — Workspace-wide `unsafe_code = "forbid"` (`[workspace.lints]`), plus `#![forbid(unsafe_code)]` on each crate root.
 
-Rust **1.88.x** is pinned in **`rust-toolchain.toml`** (required for **Pelorus Inspector** / Tauri transitive crates; the in-tree **`mdf4-rs`** policy remains edition **2024** with MSRV documented in that crate).
+Rust **1.90.x** is pinned in **`rust-toolchain.toml`** (required for **Pelorus Inspector** / Tauri transitive crates; the in-tree **`mdf4-rs`** policy remains edition **2024** with MSRV documented in that crate).
 
 ### Supporting libraries (`dbc-rs`, `mdf4-rs`)
 

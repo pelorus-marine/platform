@@ -44,7 +44,7 @@ Using Homebrew (macOS/Linux):
 brew install cargo-llvm-cov
 ```
 
-**Note**: `cargo install cargo-llvm-cov` may fail with MSRV (1.85.0) due to dependency requirements. Prebuilt binaries are recommended for local development.
+**Note**: `cargo install cargo-llvm-cov` may fail with MSRV (1.90.0) due to dependency requirements. Prebuilt binaries are recommended for local development.
 
 ### Git Pre-Commit Hook (recommended)
 
@@ -84,7 +84,7 @@ cargo clippy --no-default-features --features heapless --target thumbv7em-none-e
 **Quick reference:**
 - **Tests**: Must pass in `std`, `alloc`, and `heapless` modes
 - **Coverage**: Minimum 80%
-- **MSRV**: Must work with Rust 1.85.0
+- **MSRV**: Must work with Rust 1.90.0
 
 ### Coding Standards
 

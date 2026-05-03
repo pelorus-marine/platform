@@ -10,6 +10,6 @@ This crate is **Rust integration** aligned with normative **Pelorus Core** in `s
 - **`semantics`** (optional): enables `correlation_for_dcid` → `CorrelationSlot`.
 - **Linux / A55:** default features include `vdr` for `mdf4-rs`.
 
-Licensed **MIT OR Apache-2.0**. **MSRV:** Rust **1.88** (workspace **`rust-toolchain.toml`**). Workspace overview: **`../README.md`**.
+Licensed **MIT OR Apache-2.0**. **MSRV:** Rust **1.90** (workspace **`rust-toolchain.toml`**). Workspace overview: **`../README.md`**.
 
 **Embedded-first:** see **[`ARCHITECTURE.md` § Embedded-first](ARCHITECTURE.md#embedded-first)** and workspace **[`README.md` § Embedded-first](../README.md#embedded-first)**.

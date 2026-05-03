@@ -18,7 +18,7 @@ cargo test --workspace --all-features
 
 Canonical Rust workflow: [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-- **Pinned toolchain** — **Rust 1.88.0** from [`rust-toolchain.toml`](rust-toolchain.toml). Pelorus Inspector / Tauri and shared workspace crates need one reproducible toolchain (see [`README.md`](README.md)).
+- **Pinned toolchain** — **Rust 1.90.0** from [`rust-toolchain.toml`](rust-toolchain.toml). Pelorus Inspector / Tauri and shared workspace crates need one reproducible toolchain (see [`README.md`](README.md)).
 - **Workspace scope** — `cargo test`, `cargo clippy`, and **`cargo doc`** use **`--workspace --all-features`** with warnings denied (**`clippy`** `-D warnings`, **`RUSTDOCFLAGS="-D warnings"`** for docs).
 - **Embedded-shaped checks** — extra jobs **`cargo check`** limited feature graphs (`pelorus-core` **`canbus`** / **`canbus_heapless`** without defaults; **`pelorus-bounded`** + **`dbc-rs`** **`heapless`**) mirror on-device-ish builds.
 - **Inspector frontend** — ESLint, Vitest, **`tsc`**, production build using **Node.js 22**, matching **`website`** TypeScript CI (see `.github/workflows/ci.yml`).
