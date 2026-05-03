@@ -1,9 +1,9 @@
-//! Pelorus Core protocol constants and DCID derivation (**03-data-link-layer** §3–§5).
+//! Pelorus Core protocol constants and DCID derivation (`specifications/core/03-data-link-layer.md` §3–§5).
 //!
 //! Multi-frame transport **reassembly** is not implemented here — only numeric DCIDs and the
 //! single-frame **request** payload encoding (**03** §5.3).
 
-/// Address Claimed (**03** §4, **05-addressing**).
+/// Address Claimed (**03** §4, **05-addressing** §3).
 pub const DCID_ADDRESS_CLAIMED: u32 = 0x0EE00;
 /// Request PGN — payload carries requested DCID, 3 bytes LE (**03** §5.3).
 pub const DCID_REQUEST: u32 = 0x0EA00;
