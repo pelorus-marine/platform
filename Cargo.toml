@@ -25,4 +25,6 @@ unsafe_code = "forbid"
 
 # Rust 1.90 clippy is stricter here; mass reformatting gains little for this workspace.
 [workspace.lints.clippy]
+# Nested `if`/`let` chains stay readable in parsers and GUI helpers.
+collapsible_if = "allow"
 uninlined_format_args = "allow"

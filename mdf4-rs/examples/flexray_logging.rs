@@ -128,7 +128,7 @@ fn segment_types() -> mdf4_rs::Result<()> {
         // Dynamic segment frames (variable bandwidth, slots 101+)
         // Only sent when data changes
 
-        if cycle % 2 == 0 {
+        if cycle.is_multiple_of(2) {
             // Diagnostic request (dynamic slot 150, only even cycles)
             let diag_request = FlexRayFrame::new(
                 150,
