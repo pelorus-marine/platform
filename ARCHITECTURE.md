@@ -1,4 +1,4 @@
-# platform — architecture record
+# Pelorus Platform — architecture record
 
 **Last Updated:** May 5, 2026  
 **Status:** Living (non-normative)
