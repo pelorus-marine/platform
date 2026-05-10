@@ -88,7 +88,7 @@ Subtree pulls from upstream, when needed, follow **`README.md`** and contributor
 
 ## 7. Trademarks and third-party names
 
-When this codebase or its docs mention marine industry buses and brands **by example**, follow the same **nominative** and **non-endorsement** posture as **[`specifications/ARCHITECTURE.md` §4](https://github.com/pelorus-marine/specifications/blob/main/ARCHITECTURE.md#4-trademarks-and-third-party-names)**. **This is not legal advice.**
+When this codebase or its docs mention marine industry buses and brands **by example**, follow the same **nominative** and **non-endorsement** posture as **[`specifications/ARCHITECTURE.md` §5](https://github.com/pelorus-marine/specifications/blob/main/ARCHITECTURE.md#5-trademarks-and-third-party-names)**. **This is not legal advice.**
 
 ---
 
