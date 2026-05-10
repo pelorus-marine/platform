@@ -138,8 +138,7 @@ Fixes #123
 1. Update documentation if you're adding new features
 2. Add tests for new functionality
 3. Ensure all CI checks pass
-4. Update `CHANGELOG.md`
-5. Reference any related issues in your PR description
+4. Reference any related issues in your PR description
 
 #### PR Checklist
 

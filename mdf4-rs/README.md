@@ -6,7 +6,7 @@ Crates.io releases are published from the **[`pelorus-marine/platform`](https://
 
 ### Pelorus curation and upstream lineage
 
-**[Pelorus Marine](https://github.com/pelorus-marine)** curates this tree for the full Pelorus stack. The crates.io package name **`mdf4-rs`** is **unchanged** for semver continuity. Earlier standalone development and contributors are **upstream lineage** — acknowledged with gratitude; see **[`CHANGELOG.md`](CHANGELOG.md)** and **[`../CONTRIBUTORS.md`](../CONTRIBUTORS.md)**.
+**[Pelorus Marine](https://github.com/pelorus-marine)** curates this tree for the full Pelorus stack. The crates.io package name **`mdf4-rs`** is **unchanged** for semver continuity. Earlier standalone development and contributors are **upstream lineage** — acknowledged with gratitude; see **[`../CONTRIBUTORS.md`](../CONTRIBUTORS.md)**.
 
 [![Crates.io](https://img.shields.io/crates/v/mdf4-rs.svg)](https://crates.io/crates/mdf4-rs)
 [![Documentation](https://docs.rs/mdf4-rs/badge.svg)](https://docs.rs/mdf4-rs)
