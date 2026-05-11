@@ -9,6 +9,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod datagram_header;
 pub mod telemetry;
 
+pub use datagram_header::{DatagramHeader, FabricId};
 pub use telemetry::TelemetryEnvelope;
