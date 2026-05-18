@@ -34,8 +34,9 @@ pelorus-marine/
     pelorus-stream/
     pelorus-state/
     pelorus-core/
-    pelorus-vdr/         ← EXISTS — Phase 3 VDR binary scaffold (A55 / MDF4)
     pelorus-m7/          ← EXISTS — Phase 2 M7 `no_std` library scaffold (no `vdr` feature)
+  reference-implementations/  ← EXISTS — reference crates workspace
+    pelorus-vdr/         ← EXISTS — Phase 3 VDR binary scaffold (A55 / MDF4)
 ```
 
 ---
@@ -50,7 +51,8 @@ This is the integration state **`pelorus-core`** already relies on (**`path`** d
 
 The following are **baseline** requirements (implemented in **`platform/`**):
 
-- Virtual **`[workspace]`** at **`platform/Cargo.toml`** with members **`pelorus-bounded`**, **`dbc-rs`**, **`mdf4-rs`**, **`pelorus-inspector`**, **`pelorus-stream`**, **`pelorus-state`**, **`pelorus-core`**, **`pelorus-vdr`**, **`pelorus-m7`** (see **`§1.1`** snippet — authoritative list lives in-repo)
+- Virtual **`[workspace]`** at **`platform/Cargo.toml`** with members **`pelorus-bounded`**, **`dbc-rs`**, **`mdf4-rs`**, **`pelorus-inspector`**, **`pelorus-stream`**, **`pelorus-state`**, **`pelorus-core`**, **`pelorus-m7`** (see **`§1.1`** snippet — authoritative list lives in-repo)
+- **`pelorus-vdr`** lives in **`reference-implementations/`** (see **`reference-implementations/Cargo.toml`**)
 - **`default-members = ["pelorus-core"]`**; **`[workspace.lints]`** **`unsafe_code = "forbid"`** on cooperating members
 - **`pelorus-core`** depends on **`dbc-rs`** / **`mdf4-rs`** via **`path = "../dbc-rs"`** and **`path = "../mdf4-rs"`** (optional features per **`pelorus-core/Cargo.toml`**)
 - Subtree **`git subtree pull`** workflow from upstream when Pelorus needs changes — see **`platform/README.md`**
@@ -115,8 +117,9 @@ The repo uses a **virtual workspace** at `platform/Cargo.toml` with member direc
 - `pelorus-core/` — Cargo package **`pelorus-core`** (`pelorus_core`) — CAN / DCID / VDR / own-ship; catalog correlation (`SemanticPath`, `CorrelationSlot`)
 - `pelorus-stream/` — Stream transport scaffolding
 - `pelorus-state/` — State fusion scaffold
-- `pelorus-vdr/` — VDR service scaffold (Phase 3; **`vdr`** feature on **`pelorus-core`**)
 - `pelorus-m7/` — M7 firmware library scaffold (Phase 2; **`canbus_heapless`** only — **no `vdr`**)
+
+**`reference-implementations/pelorus-vdr/`** — VDR service scaffold (Phase 3; **`vdr`** feature on **`pelorus-core`**)
 
 ```toml
 # platform/Cargo.toml (workspace root) — abbreviated; verify in-repo for exact order
@@ -130,13 +133,18 @@ members = [
   "pelorus-stream",
   "pelorus-state",
   "pelorus-core",
-  "pelorus-vdr",
   "pelorus-m7",
 ]
 default-members = ["pelorus-core"]
 ```
 
-Per-crate manifests and features live in each member’s `Cargo.toml`.
+Per-crate manifests and features live in each member’s `Cargo.toml`. **`pelorus-vdr`** is a member of **`reference-implementations/Cargo.toml`**, not **`platform`**.
+
+```toml
+# reference-implementations/Cargo.toml (abbreviated)
+[workspace]
+members = ["pelorus-gnss", "pelorus-gateway", "pelorus-vdr"]
+```
 
 ### 1.2 — Crate structure
 
@@ -263,10 +271,10 @@ to the M7 firmware `Cargo.toml` is immediately visible and reviewable.
 **Goal**: Voyage Data Recorder pipeline on the A55 Linux side, recording all
 Pelorus Core signals as ASAM MDF4 for regulatory compliance and post-voyage analysis.
 
-### 3.1 — `pelorus-vdr` Binary (inside `ecdis` workspace or `platform`)
+### 3.1 — `pelorus-vdr` Binary (`reference-implementations`)
 
 ```
-pelorus-vdr/
+reference-implementations/pelorus-vdr/
   src/
     main.rs         # tokio service, reads IPC from M7 shared memory
     pipeline.rs     # IPC frames → dbc-rs decode → mdf4-rs CanDbcLogger

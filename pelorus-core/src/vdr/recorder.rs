@@ -1,6 +1,6 @@
 //! Placeholder surface for **`mdf4_rs::can::CanDbcLogger`**.
 //!
-//! A full recorder binary (`pelorus-vdr`) belongs in application code; keep this crate as an
+//! A full recorder binary (`reference-implementations/pelorus-vdr`) belongs in application code; keep this crate as an
 //! integration library boundary.
 
 #[cfg(feature = "vdr")]

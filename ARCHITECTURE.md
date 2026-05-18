@@ -53,8 +53,9 @@ For the wider **Legacy Marine Data Ecosystem (LMDE)** context, problem statement
 | [`pelorus-stream/`](pelorus-stream/) | Stream transport scaffolding; depends on **`pelorus-core`** with tight feature control. |
 | [`pelorus-state/`](pelorus-state/) | State fusion scaffolding; optional **`pelorus-stream`** via features. |
 | [`pelorus-inspector/`](pelorus-inspector/) | Desktop tooling (Tauri); not on embedded targets. |
-| [`pelorus-vdr/`](pelorus-vdr/) | **Phase 3** VDR **binary scaffold** (Linux / A55 orientation); MDF4 naming aligns with **`pelorus_core::vdr`**. |
 | [`pelorus-m7/`](pelorus-m7/) | **Phase 2** **no_std** firmware **library scaffold** — **`pelorus-core`** with **`canbus_heapless`** only; **must not** enable **`vdr`** (host-side). |
+
+**Phase 3** VDR binary scaffold lives in **[`reference-implementations/pelorus-vdr`](https://github.com/pelorus-marine/reference-implementations/tree/main/pelorus-vdr)** (MDF4 naming aligns with **`pelorus_core::vdr`**).
 
 **Default workspace member for local iteration:** **`pelorus-core`** (`default-members` in [`Cargo.toml`](Cargo.toml)).
 
