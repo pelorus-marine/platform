@@ -1,7 +1,7 @@
 # platform (Rust workspace)
 
 **Pelorus first. Period.**  
-This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog correlation types), Stream, State, aligned with **`specifications/`**. In-tree **`dbc-rs`** and **`mdf4-rs`** exist to **serve Pelorus** (CAN/DBC, MDF4/VDR)—not as ends in themselves.
+This workspace ships the **Pelorus** stack: **`pelorus-core`** (Core **building blocks**, embedded-first via **`pelorus-bounded`**), Stream, State, aligned with **`specifications/`**. Reference binaries that **prove** Core blocks live in **`reference-implementations/`**. In-tree **`dbc-rs`** and **`mdf4-rs`** support future VDR/decode paths—not Core MVP blockers.
 
 ## Principles
 
@@ -21,10 +21,10 @@ This workspace ships the **Pelorus** stack: **`pelorus-core`** (includes catalog
 Concretely:
 
 - **`no_std` and bounded memory** shape APIs and reviews from the start. Prefer **explicit limits**, **deterministic errors** (no silent growth), and **optional features** so `std`, heavy serde trees, or unbounded heaps are not on the critical path for settlers.
-- **CI must exercise minimal feature sets**—e.g. `cargo check -p pelorus-core --no-default-features --features canbus,alloc` and equivalent paths for **`dbc-rs`** / **`mdf4-rs`**—so regressions show up before a product board does.
+- **CI must exercise minimal feature sets**—e.g. `cargo check -p pelorus-core --no-default-features --features heapless` and `features alloc`—so regressions show up before a product board does.
 - **`dbc-rs`** **`compat`** re-exports **`pelorus-bounded`** (`alloc` vs **`heapless`**) so DBC-shaped strings and collections match **_firmware_** policies, not only desktop parsers.
 - **`mdf4-rs`** today is **`no_std` + `alloc`** for writers and bus loggers where a **global allocator** is acceptable; targets that **cannot** use `alloc` need a **named, tiered story** (capped writer subset, ring-buffer + finalize, or host-side MDF packaging)—that gap is acknowledged and closed deliberately, not by pretending MDF equals laptop RAM.
-- **Bounded primitives** live in **`pelorus-bounded`**; **`pelorus-core`** selects **`canbus`** (**`alloc`**) or **`canbus_heapless`** instead of reinventing **`String<N>`** / **`Vec<T, N>`** beside **`dbc-rs`**.
+- **Bounded primitives** live in **`pelorus-bounded`**; **`pelorus-core`** always consumes them via **`alloc`** or **`heapless`** features (no ad-hoc `alloc::vec` in library code).
 
 **Pelorus first** still resolves conflicts—but **embedded-first** means those conflicts are judged against **what ships on silicon**, not host convenience alone.
 
@@ -65,7 +65,8 @@ Further context: normative specs stay in `specifications/`, the ECDIS app in `ec
 
 | Member | Role |
 |--------|------|
-| **`pelorus-core/`** | **Package `pelorus-core`** — Pelorus CAN FD / DCID / VDR / own-ship; `SemanticPath` / `CorrelationSlot` |
+| **`pelorus-core/`** | **Package `pelorus-core`** — Core building blocks (wire, `CanFdBus`, addressing, power, transport); **0.1.0** pre-MVP |
+| **`pelorus-core-sim/`** | **Package `pelorus-core-sim`** — in-memory bus simulations for development (`cargo run -p pelorus-core-sim`) |
 | **`pelorus-stream/`** | Stream telemetry envelope + future wire decoders |
 | **`pelorus-state/`** | State / fusion hooks over Core correlation (+ optional `stream`) |
 | **`pelorus-inspector/`** | **Pelorus Inspector** — Tauri desktop MDF4 / DBC / SocketCAN tool (TypeScript + Rust); successor to archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer) |
@@ -77,8 +78,10 @@ Further context: normative specs stay in `specifications/`, the ECDIS app in `ec
 cd platform
 cargo build --workspace
 cargo test --workspace --all-features
-cargo check -p pelorus-core --no-default-features --features canbus,alloc
-cargo check -p pelorus-core --no-default-features --features canbus_heapless
+cargo check -p pelorus-core --no-default-features --features heapless
+cargo test -p pelorus-core --features sim
+# Reference validation (sibling repo):
+cargo run -p pelorus-core-sim
 ```
 
 Licensed **MIT OR Apache-2.0** (see `LICENSE-*` in this directory).

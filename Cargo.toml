@@ -8,6 +8,7 @@ members = [
   "pelorus-stream",
   "pelorus-state",
   "pelorus-core",
+  "pelorus-core-sim",
   "pelorus-m7",
 ]
 default-members = ["pelorus-core"]

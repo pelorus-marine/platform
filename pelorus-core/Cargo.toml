@@ -1,34 +1,38 @@
 [package]
 name = "pelorus-core"
-version = "0.1.1"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.90.0"
 license = "MIT OR Apache-2.0"
 authors = ["Pelorus Marine contributors <https://github.com/pelorus-marine>"]
-description = "Pelorus Core integration — CAN FD, DCID, VDR, ECDIS own-ship (Pelorus-first; in-tree dbc-rs / mdf4-rs)"
+description = "Pelorus Core building blocks — embedded-first protocol primitives (CAN FD, addressing, …)"
 readme = "README.md"
 repository = "https://github.com/pelorus-marine/platform"
 
-[build-dependencies]
-toml = "0.8"
-
 [dependencies]
-dbc-rs = { path = "../dbc-rs", version = "0.5.1", optional = true, default-features = false }
-mdf4-rs = { path = "../mdf4-rs", version = "0.3.1", optional = true, default-features = false }
-embedded-can = { workspace = true, optional = true }
+pelorus-bounded = { path = "../pelorus-bounded", version = "0.1.1", default-features = false, optional = true }
 
 [features]
-default = ["std", "canbus", "vdr"]
-std = ["dbc-rs?/std", "mdf4-rs?/std"]
-semantics = []
-alloc = ["dbc-rs?/alloc"]
-canbus = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/alloc"]
-canbus_heapless = ["dep:dbc-rs", "dep:embedded-can", "dbc-rs/embedded-can", "dbc-rs/heapless"]
-vdr = ["dep:mdf4-rs", "dep:dbc-rs", "std", "mdf4-rs/std", "mdf4-rs/dbc", "dbc-rs/std"]
-hw_test = []
+default = ["alloc"]
+alloc = ["dep:pelorus-bounded", "pelorus-bounded/alloc"]
+heapless = ["dep:pelorus-bounded", "pelorus-bounded/heapless"]
+# In-memory CAN medium for `pelorus-core-sim` and gated tests (requires `alloc`).
+sim = ["alloc"]
 
 [package.metadata.docs.rs]
 all-features = true
+
+[[test]]
+name = "address_claiming"
+required-features = ["sim"]
+
+[[test]]
+name = "power_nm"
+required-features = ["alloc"]
+
+[[test]]
+name = "transport_broadcast"
+required-features = ["alloc"]
 
 [lints]
 workspace = true

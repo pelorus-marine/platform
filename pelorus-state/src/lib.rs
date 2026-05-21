@@ -6,7 +6,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
-use pelorus_core::CorrelationSlot;
+#[cfg(feature = "stream")]
+use pelorus_stream::CorrelationSlot;
 
 #[cfg(feature = "stream")]
 pub use pelorus_stream::TelemetryEnvelope;
@@ -17,15 +18,16 @@ pub struct StateScaffold;
 
 impl StateScaffold {
     /// Whether a [`CorrelationSlot`] is attached (demo hook for validation pipelines).
+    #[cfg(feature = "stream")]
     pub fn correlation_attached(c: CorrelationSlot<'_>) -> bool {
         c.vessel.is_some()
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "stream"))]
 mod tests {
     use super::*;
-    use pelorus_core::SemanticPath;
+    use pelorus_stream::SemanticPath;
 
     #[test]
     fn scaffold_sees_vessel_slot() {

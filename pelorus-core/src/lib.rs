@@ -1,33 +1,60 @@
-//! Pelorus **`pelorus-core`** Rust crate: **DCID** schema, optional **CAN bus** decode, optional **VDR**
-//! hooks, and **own-ship** snapshots for charting.
+//! Pelorus **Core** building blocks — reusable protocol primitives aligned with
+//! `specifications/core/`, composed by firmware and by reference binaries under
+//! `pelorus-marine/reference-implementations/`.
 //!
-//! **`pelorus-stream`** and **`pelorus-state`** are sibling crates under the **`platform/`** workspace root (`../`).
-//! Shared catalog correlation types live in **`correlation`** (no separate semantics crate).
+//! **Embedded-first:** enable `alloc` or `heapless` (both pull in [`pelorus_bounded`]);
+//! use `default-features = false` on MCUs. Host validation uses the `sim` feature from
+//! reference-implementations, not from production firmware.
 //!
-//! See the workspace **`README.md`** and [`ARCHITECTURE.md`] in this directory.
+//! ## Building blocks
 //!
-//! Disable default features on MCUs: omit `std` and `vdr`, keep `canbus` for CAN FD + DBC decode.
-//!
-//! ## Safety
-//!
-//! `#![forbid(unsafe_code)]` is a project invariant (see `PELORUS_IMPLEMENTATION_PLAN.md`).
+//! | Module | Spec | Notes |
+//! |--------|------|-------|
+//! | [`wire`] | 03 §2 | Identifier pack/unpack |
+//! | [`bus`] | 03 §1 | [`CanFdBus`] trait |
+//! | [`addressing`] | 05 | Address claiming (step 1) |
+//! | [`power`] | 04 | WUF + network management |
+//! | [`transport`] | 03 §4 | Multi-frame transport |
 
-#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(not(feature = "alloc"), no_std)]
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
-#[cfg(feature = "canbus")]
-pub mod canbus;
-pub mod correlation;
-pub mod dcid;
-pub mod ownship;
-#[cfg(feature = "semantics")]
-pub mod semantics;
-#[cfg(feature = "vdr")]
-pub mod vdr;
+#[cfg(all(not(feature = "alloc"), not(feature = "heapless")))]
+compile_error!("pelorus-core requires feature `alloc` or `heapless` (pelorus-bounded)");
 
-pub use correlation::{CorrelationSlot, SemanticPath};
-pub use ownship::snapshot::OwnShipSnapshot;
-pub use ownship::state::ShipState;
-#[cfg(feature = "semantics")]
-pub use semantics::correlation_for_dcid;
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+pub mod addressing;
+pub mod bus;
+pub mod power;
+pub mod transport;
+pub mod wire;
+
+pub use addressing::{
+    AddressClaimConfig, AddressClaimEngine, AddressClaimFrame, AddressCommandFrame, ClaimAction,
+    ClaimState, Name, NameBuilder, DEFAULT_LISTEN_MS, MAX_CLAIMED_ADDRESS,
+};
+pub use bus::{CanFdBus, CanFdFrame, CAN_FD_MAX_DATA};
+#[cfg(feature = "sim")]
+pub use bus::{SimBusError, SimPort, SimulatedBus, SIM_BUS_FRAME_CAP};
+pub use power::{
+    ClusterNmState, FunctionalGroups, NetworkManagementConfig, NetworkManagementEngine,
+    NetworkManagementFrame, NmAction, NmWireState, PowerState, WakeUpFrame, ANCHOR_WATCH, COMMS,
+    DOMESTIC, ENGINE, NM_PERIOD_MS, READY_SLEEP_MS, REPEAT_MESSAGE_MS, STORM, UNDERWAY,
+    V1_STD_MASK, WAIT_BUS_SLEEP_MS,
+};
+pub use transport::{
+    AbortControl, BroadcastOpenControl, CloseControl, ControlOpcode, IngressBroadcastSession,
+    IngressResult, MultiframeControl, MultiframeData, OpenAckControl, OpenControl, OpenNakControl,
+    TransportAction, TransportReasonCode, TransportStatusCode, WindowControl, WINDOW_MISSING_CAP,
+    crc32, DEFAULT_REASSEMBLY_CAP, MAX_CONCURRENT_EGRESS, MAX_CONCURRENT_INGRESS,
+    MULTIFRAME_DATA_CHUNK,
+};
+pub use wire::{
+    DcId, Identifier, dc_id_from_identifier, identifier_from_parts, pack_identifier,
+    unpack_identifier, DC_ID_ADDRESS_CLAIM, DC_ID_ADDRESS_COMMAND, DC_ID_MULTIFRAME_CONTROL,
+    DC_ID_MULTIFRAME_DATA, DC_ID_NETWORK_MANAGEMENT, DC_ID_WAKE_UP, PRIORITY_ADDRESSING,
+    PRIORITY_MULTIFRAME, PRIORITY_NETWORK_MANAGEMENT, PRIORITY_WAKE_UP,
+};

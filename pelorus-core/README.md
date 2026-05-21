@@ -1,15 +1,29 @@
-# pelorus-core (Rust crate)
+# pelorus-core
 
-Core **CAN FD** / **DCID** integration, optional **VDR** (MDF4), and **own-ship** snapshots for charting — plus **`SemanticPath`** / **`CorrelationSlot`** under **`pelorus_core::correlation`**. Cargo package **`pelorus-core`** (Rust **`pelorus_core`**); sibling Stream/State crates: **`pelorus-stream/`**, **`pelorus-state/`** (workspace root: **`../`**).
+**Pelorus Core building blocks** — one type per source file for navigation. Spec: [`specifications/core/`](../../specifications/core/).
 
-This crate is **Rust integration** aligned with normative **Pelorus Core** in `specifications/`—it does not replace the spec text.
+| Module | Spec | Status |
+|--------|------|--------|
+| [`wire/`](src/wire/) | 03 §2 | Identifiers |
+| [`bus/`](src/bus/) | 03 §1 | `CanFdBus` |
+| [`addressing/`](src/addressing/) | 05 | Address claiming |
+| [`power/`](src/power/) | 04 | Wake-up + network management |
+| [`transport/`](src/transport/) | 03 §4 | Multi-frame transport |
 
-**Spec coverage in code (non-exhaustive):** `pelorus_core::dcid::protocol` — reserved DCIDs and **03** §3.2 DCID derivation / **0x0EA00** request payload; `pelorus_core::dcid::wire` — **04** §7 **WUF** / **NM** v1.0 eight-byte payloads. J1939 **transport protocol** reassembly (**03** §5) and **05** address-claim state machines are **not** implemented here yet (decode remains **DBC**-driven when **`canbus`** is enabled).
+## Dependencies
 
-- **M7 / bare-metal:** `default-features = false`, then enable **`canbus`** (uses **`dbc-rs`** + **`alloc`**) or **`canbus_heapless`** (same CAN stack without a global allocator via **`dbc-rs/heapless`**). Do not enable both **`canbus`** and **`canbus_heapless`** on the same build.
-- **`semantics`** (optional): enables `correlation_for_dcid` → `CorrelationSlot`.
-- **Linux / A55:** default features include `vdr` for `mdf4-rs`.
+```toml
+pelorus-core = { path = "../pelorus-core", default-features = false, features = ["heapless"] }
+```
 
-Licensed **MIT OR Apache-2.0**. **MSRV:** Rust **1.90** (workspace **`rust-toolchain.toml`**). Workspace overview: **`../README.md`**.
+Host / dev validation uses sibling [`pelorus-core-sim`](../pelorus-core-sim/) (`alloc` + `sim` on `pelorus-core` only there).
 
-**Embedded-first:** see **[`ARCHITECTURE.md` § Embedded-first](ARCHITECTURE.md#embedded-first)** and workspace **[`README.md` § Embedded-first](../README.md#embedded-first)**.
+## Tests
+
+```bash
+cargo test -p pelorus-core --features sim,alloc
+```
+
+Development simulations (no hardware): [`../pelorus-core-sim/`](../pelorus-core-sim/) — `cargo run -p pelorus-core-sim`.
+
+**Version:** `0.1.0` (pre-MVP).

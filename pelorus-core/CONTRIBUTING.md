@@ -1,14 +1,18 @@
-# Contributing — `pelorus-core` crate
+# Contributing — pelorus-core
 
-From the **workspace root** (monorepo **`platform/`** directory):
+Building blocks for Pelorus Core. **Validate behavior** in [`reference-implementations`](../../reference-implementations/) when adding protocol surfaces — not only unit tests in this crate.
+
+From the workspace root:
 
 ```bash
 cargo fmt --all
-cargo clippy -p pelorus-core --all-features
+cargo clippy -p pelorus-core --all-features -- -D warnings
 cargo test -p pelorus-core --all-features
+cargo run -p pelorus-core-sim
 ```
 
-- **Safe Rust only** — no `unsafe` (workspace `[lints]` + `#![forbid(unsafe_code)]` on this crate)
-- Prefer **feature flags** over target `cfg` leaks: `canbus` vs `vdr` vs `std` vs **`semantics`**
-- **Stream**/**State** code belongs in **`../pelorus-stream`** / **`../pelorus-state`**, not here
-- Widening public `Dcid` is **spec-affecting** — link `specifications/` PRs
+- **Safe Rust only** — `#![forbid(unsafe_code)]`
+- Use **`pelorus-bounded`** collections — do not add direct `alloc::vec` in library code
+- **Embedded-first defaults:** `default = ["alloc"]` only; gate host-only code behind `sim`
+- Wire / DC_ID changes need matching `specifications/` updates
+- Stream/State logic stays in sibling crates

@@ -11,11 +11,10 @@ repository = "https://github.com/pelorus-marine/platform"
 
 [features]
 default = ["std"]
-std = ["pelorus-core/std"]
+std = []
 alloc = []
 
 [dependencies]
-pelorus-core = { path = "../pelorus-core", version = "0.1.1", default-features = false }
 
 [package.metadata.docs.rs]
 all-features = true

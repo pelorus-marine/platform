@@ -2610,12 +2610,17 @@ dependencies = [
 
 [[package]]
 name = "pelorus-core"
-version = "0.1.1"
+version = "0.1.0"
 dependencies = [
- "dbc-rs",
- "embedded-can",
- "mdf4-rs",
- "toml 0.8.2",
+ "pelorus-bounded",
+]
+
+[[package]]
+name = "pelorus-core-sim"
+version = "0.1.0"
+dependencies = [
+ "pelorus-bounded",
+ "pelorus-core",
 ]
 
 [[package]]
@@ -2657,16 +2662,12 @@ dependencies = [
 name = "pelorus-state"
 version = "0.1.1"
 dependencies = [
- "pelorus-core",
  "pelorus-stream",
 ]
 
 [[package]]
 name = "pelorus-stream"
 version = "0.1.1"
-dependencies = [
- "pelorus-core",
-]
 
 [[package]]
 name = "percent-encoding"

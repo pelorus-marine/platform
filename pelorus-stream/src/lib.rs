@@ -1,7 +1,7 @@
 //! Pelorus **Stream** subsystem — Ethernet, non–safety-critical transport plane.
 //!
 //! Decoders and network stacks accumulate here behind feature flags.
-//! Semantic correlation surfaces through [`pelorus_core::CorrelationSlot`].
+//! Semantic correlation surfaces through [`CorrelationSlot`](correlation::CorrelationSlot).
 //!
 //! **Pelorus State** lives in **`pelorus-state`** in the same workspace.
 
@@ -9,8 +9,10 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod correlation;
 pub mod datagram_header;
 pub mod telemetry;
 
+pub use correlation::{CorrelationSlot, SemanticPath};
 pub use datagram_header::{DatagramHeader, FabricId};
 pub use telemetry::TelemetryEnvelope;

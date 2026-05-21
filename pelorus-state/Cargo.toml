@@ -10,12 +10,11 @@ readme = "README.md"
 repository = "https://github.com/pelorus-marine/platform"
 
 [dependencies]
-pelorus-core = { path = "../pelorus-core", version = "0.1.1", default-features = false }
 pelorus-stream = { path = "../pelorus-stream", version = "0.1.1", optional = true, default-features = false }
 
 [features]
-default = ["std"]
-std = ["pelorus-core/std", "pelorus-stream?/std"]
+default = ["std", "stream"]
+std = ["pelorus-stream?/std"]
 stream = ["dep:pelorus-stream"]
 
 [package.metadata.docs.rs]

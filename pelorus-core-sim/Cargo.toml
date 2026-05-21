@@ -1,0 +1,24 @@
+[package]
+name = "pelorus-core-sim"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90.0"
+license = "MIT OR Apache-2.0"
+authors = ["Pelorus Marine contributors <https://github.com/pelorus-marine>"]
+description = "In-memory Pelorus Core bus simulations — development validation for pelorus-core building blocks"
+readme = "README.md"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "pelorus-core-sim"
+path = "src/main.rs"
+
+[dependencies]
+pelorus-bounded = { path = "../pelorus-bounded", version = "0.1.1", default-features = false, features = ["alloc"] }
+pelorus-core = { path = "../pelorus-core", version = "0.1.0", default-features = false, features = ["alloc", "sim"] }
+
+[lints]
+workspace = true

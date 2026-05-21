@@ -35,8 +35,8 @@ jobs:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
       - run: cargo test --workspace --all-features --verbose
 
-  pelorus-core-canbus:
-    name: Pelorus Core (canbus / canbus_heapless, no defaults)
+  pelorus-core-embedded:
+    name: Pelorus Core (heapless + alloc, no sim)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,9 +45,9 @@ jobs:
         with:
           toolchain: ${{ env.RUST_TOOLCHAIN }}
 
-      - run: cargo check -p pelorus-core --no-default-features --features canbus,alloc --verbose
+      - run: cargo check -p pelorus-core --no-default-features --features heapless --verbose
 
-      - run: cargo check -p pelorus-core --no-default-features --features canbus_heapless --verbose
+      - run: cargo check -p pelorus-core --no-default-features --features alloc --verbose
 
   dbc-rs-heapless:
     name: dbc-rs + pelorus-bounded (heapless, no alloc)

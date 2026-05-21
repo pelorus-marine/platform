@@ -5,7 +5,7 @@ edition = "2024"
 rust-version = "1.90.0"
 license = "MIT OR Apache-2.0"
 authors = ["Pelorus Marine contributors <https://github.com/pelorus-marine>"]
-description = "Pelorus Cortex-M7 firmware scaffold — CAN FD decode (Phase 2); never enables pelorus-core/vdr."
+description = "Pelorus Cortex-M7 firmware scaffold — Core address claiming (Phase 2)."
 readme = "README.md"
 publish = false
 
@@ -13,7 +13,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
-pelorus-core = { path = "../pelorus-core", version = "0.1.1", default-features = false, features = ["canbus_heapless"] }
+pelorus-core = { path = "../pelorus-core", version = "0.1.0", default-features = false, features = ["heapless"] }
 
 [lints]
 workspace = true
