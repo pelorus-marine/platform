@@ -2,7 +2,7 @@
 
 use crate::bus::CanFdFrame;
 use crate::wire::{
-    pack_identifier, unpack_identifier, DC_ID_NETWORK_MANAGEMENT, PRIORITY_NETWORK_MANAGEMENT,
+    DC_ID_NETWORK_MANAGEMENT, PRIORITY_NETWORK_MANAGEMENT, pack_identifier, unpack_identifier,
 };
 
 use super::{FunctionalGroups, NmWireState};
@@ -60,6 +60,9 @@ mod tests {
             active_groups: FunctionalGroups(super::super::functional_groups::ENGINE),
         };
         let frame = nm.into_can_frame();
-        assert_eq!(NetworkManagementFrame::parse(frame.id, frame.payload()), Some(nm));
+        assert_eq!(
+            NetworkManagementFrame::parse(frame.id, frame.payload()),
+            Some(nm)
+        );
     }
 }

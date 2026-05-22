@@ -33,18 +33,20 @@ pub fn run() -> Result<(), SimError> {
     strong.start(now);
     weak.start(now);
 
-    let mut port = bus.port();
-    if let Some(action) = strong.tick(now) {
-        AddressClaimEngine::apply_action(action, &mut port)
-            .map_err(|_| SimError("strong claim transmit failed"))?;
+    {
+        let mut port = bus.port();
+        if let Some(action) = strong.tick(now) {
+            AddressClaimEngine::apply_action(action, &mut port)
+                .map_err(|_| SimError("strong claim transmit failed"))?;
+        }
     }
-    drop(port);
 
-    let mut port = bus.port();
-    while let Ok(Some(frame)) = port.try_receive() {
-        let _ = weak.on_frame(now, &frame);
+    {
+        let mut port = bus.port();
+        while let Ok(Some(frame)) = port.try_receive() {
+            let _ = weak.on_frame(now, &frame);
+        }
     }
-    drop(port);
 
     let weak_sa = run_until_claimed(&mut weak, &mut bus, &mut now)?;
 
@@ -67,12 +69,13 @@ fn run_until_claimed(
 ) -> Result<u8, SimError> {
     loop {
         *now = now.saturating_add(10);
-        let mut port = bus.port();
-        if let Some(action) = engine.tick(*now) {
-            AddressClaimEngine::apply_action(action, &mut port)
-                .map_err(|_| SimError("claim transmit failed"))?;
+        {
+            let mut port = bus.port();
+            if let Some(action) = engine.tick(*now) {
+                AddressClaimEngine::apply_action(action, &mut port)
+                    .map_err(|_| SimError("claim transmit failed"))?;
+            }
         }
-        drop(port);
         bus.finish_round();
         if let ClaimState::Claimed { sa } = engine.state() {
             return Ok(sa);

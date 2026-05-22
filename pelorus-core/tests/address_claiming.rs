@@ -14,11 +14,12 @@ fn name_with_identity(id: u32) -> Name {
 fn run_until_claimed(engine: &mut AddressClaimEngine, bus: &mut SimulatedBus, now: &mut u32) -> u8 {
     loop {
         *now = now.saturating_add(10);
-        let mut port = bus.port();
-        if let Some(action) = engine.tick(*now) {
-            AddressClaimEngine::apply_action(action, &mut port).unwrap();
+        {
+            let mut port = bus.port();
+            if let Some(action) = engine.tick(*now) {
+                AddressClaimEngine::apply_action(action, &mut port).unwrap();
+            }
         }
-        drop(port);
         bus.finish_round();
         if let ClaimState::Claimed { sa } = engine.state() {
             return sa;
@@ -61,19 +62,19 @@ fn lower_name_wins_same_address() {
     strong.start(now);
     weak.start(now);
 
-    // Strong node finishes listen immediately and claims.
-    let mut port = bus.port();
-    if let Some(a) = strong.tick(now) {
-        AddressClaimEngine::apply_action(a, &mut port).unwrap();
+    {
+        let mut port = bus.port();
+        if let Some(a) = strong.tick(now) {
+            AddressClaimEngine::apply_action(a, &mut port).unwrap();
+        }
     }
-    drop(port);
 
-    // Weak node hears the claim and must pick another address.
-    let mut port = bus.port();
-    while let Some(frame) = port.try_receive().unwrap() {
-        let _ = weak.on_frame(now, &frame);
+    {
+        let mut port = bus.port();
+        while let Some(frame) = port.try_receive().unwrap() {
+            let _ = weak.on_frame(now, &frame);
+        }
     }
-    drop(port);
     bus.finish_round();
 
     let weak_sa = run_until_claimed(&mut weak, &mut bus, &mut now);
@@ -93,14 +94,16 @@ fn commanded_address_overrides_target() {
         target_name,
         new_address: 0x55,
     };
-    let mut port = bus.port();
-    port.try_transmit(&cmd.into_can_frame()).unwrap();
-    drop(port);
-
-    let mut port = bus.port();
-    while let Some(frame) = port.try_receive().unwrap() {
-        let _ = target.on_frame(0, &frame);
+    {
+        let mut port = bus.port();
+        port.try_transmit(&cmd.into_can_frame()).unwrap();
     }
-    drop(port);
+
+    {
+        let mut port = bus.port();
+        while let Some(frame) = port.try_receive().unwrap() {
+            let _ = target.on_frame(0, &frame);
+        }
+    }
     assert_eq!(target.claimed_address(), Some(0x55));
 }

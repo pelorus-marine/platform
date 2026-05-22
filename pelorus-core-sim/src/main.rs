@@ -7,7 +7,7 @@
 //! cargo run -p pelorus-core-sim -- transport
 //! ```
 
-use pelorus_core_sim::{addressing, power, transport, SimError};
+use pelorus_core_sim::{SimError, addressing, power, transport};
 
 fn main() {
     let mode = std::env::args()

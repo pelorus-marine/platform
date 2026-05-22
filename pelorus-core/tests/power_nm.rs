@@ -1,8 +1,8 @@
 //! Power / NM frames and cluster FSM (`04-power.md`).
 
 use pelorus_core::{
-    ClusterNmState, FunctionalGroups, NetworkManagementConfig, NetworkManagementEngine,
-    NetworkManagementFrame, NmWireState, WakeUpFrame, ENGINE, REPEAT_MESSAGE_MS, UNDERWAY,
+    ClusterNmState, ENGINE, FunctionalGroups, NetworkManagementConfig, NetworkManagementEngine,
+    NetworkManagementFrame, NmWireState, REPEAT_MESSAGE_MS, UNDERWAY, WakeUpFrame,
 };
 
 #[test]
@@ -39,11 +39,14 @@ fn repeat_expires_to_ready_sleep_without_work() {
         0x20,
         FunctionalGroups(UNDERWAY),
     ));
-    let _ = nm.on_frame(0, &WakeUpFrame {
-        source_address: 0x01,
-        groups: FunctionalGroups(UNDERWAY),
-    }
-    .into_can_frame());
+    let _ = nm.on_frame(
+        0,
+        &WakeUpFrame {
+            source_address: 0x01,
+            groups: FunctionalGroups(UNDERWAY),
+        }
+        .into_can_frame(),
+    );
     let _ = nm.tick(REPEAT_MESSAGE_MS);
     assert_eq!(nm.cluster_state(), ClusterNmState::ReadySleep);
 }

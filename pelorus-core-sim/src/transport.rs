@@ -1,8 +1,8 @@
 //! Broadcast multi-frame transport simulation (`03-data-link.md` §4.5).
 
 use pelorus_core::{
-    BroadcastOpenControl, IngressBroadcastSession, IngressResult, MultiframeControl, MultiframeData,
-    crc32,
+    BroadcastOpenControl, IngressBroadcastSession, IngressResult, MultiframeControl,
+    MultiframeData, crc32,
 };
 
 use crate::SimError;

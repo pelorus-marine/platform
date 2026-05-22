@@ -1,9 +1,7 @@
 //! `Pelorus.MultiFrameData` frame (`03-data-link.md` §4.3).
 
 use crate::bus::CanFdFrame;
-use crate::wire::{
-    pack_identifier, unpack_identifier, DC_ID_MULTIFRAME_DATA, PRIORITY_MULTIFRAME,
-};
+use crate::wire::{DC_ID_MULTIFRAME_DATA, PRIORITY_MULTIFRAME, pack_identifier, unpack_identifier};
 
 use super::session_limits::MULTIFRAME_DATA_CHUNK;
 
@@ -44,12 +42,9 @@ impl MultiframeData {
             return None;
         }
         let session_id = u16::from_le_bytes([payload[0], payload[1]]);
-        let sequence_number = u32::from_le_bytes([
-            payload[2], payload[3], payload[4], payload[5],
-        ]);
+        let sequence_number = u32::from_le_bytes([payload[2], payload[3], payload[4], payload[5]]);
         let mut data = pelorus_bounded::Vec::new();
-        data.extend_from_slice(&payload[6..])
-            .ok()?;
+        data.extend_from_slice(&payload[6..]).ok()?;
         Some(Self {
             source_address: parts.source_address,
             session_id,

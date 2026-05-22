@@ -23,15 +23,19 @@ impl SimulatedBus {
     /// Empty bus.
     #[must_use]
     pub fn new() -> Self {
-        Self {
-            frames: Vec::new(),
-        }
+        Self { frames: Vec::new() }
     }
 
     /// Pending frame count.
     #[must_use]
     pub fn len(&self) -> usize {
         self.frames.len()
+    }
+
+    /// `true` when [`Self::len`] is zero.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.frames.is_empty()
     }
 
     /// Clear the medium without delivering frames.

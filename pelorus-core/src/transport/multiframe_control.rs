@@ -2,12 +2,12 @@
 
 use crate::bus::CanFdFrame;
 use crate::wire::{
-    pack_identifier, unpack_identifier, DC_ID_MULTIFRAME_CONTROL, PRIORITY_MULTIFRAME,
+    DC_ID_MULTIFRAME_CONTROL, PRIORITY_MULTIFRAME, pack_identifier, unpack_identifier,
 };
 
 use super::{
     AbortControl, BroadcastOpenControl, CloseControl, ControlOpcode, OpenAckControl, OpenControl,
-    OpenNakControl, TransportReasonCode, TransportStatusCode, WindowControl, WINDOW_MISSING_CAP,
+    OpenNakControl, TransportReasonCode, TransportStatusCode, WINDOW_MISSING_CAP, WindowControl,
 };
 
 /// Decoded multi-frame control payload.
@@ -196,7 +196,10 @@ fn decode_window(p: &[u8]) -> Option<MultiframeControl> {
         }
         missing
             .push(u32::from_le_bytes([
-                p[off], p[off + 1], p[off + 2], p[off + 3],
+                p[off],
+                p[off + 1],
+                p[off + 2],
+                p[off + 3],
             ]))
             .ok()?;
     }

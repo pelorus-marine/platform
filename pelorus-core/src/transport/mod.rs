@@ -36,4 +36,4 @@ pub use session_limits::{
 pub use transport_action::TransportAction;
 pub use transport_reason_code::TransportReasonCode;
 pub use transport_status_code::TransportStatusCode;
-pub use window_control::{WindowControl, WINDOW_MISSING_CAP};
+pub use window_control::{WINDOW_MISSING_CAP, WindowControl};

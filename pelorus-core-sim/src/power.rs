@@ -1,8 +1,8 @@
 //! Wake-up and network-management simulation (`04-power.md`).
 
 use pelorus_core::{
-    ClusterNmState, FunctionalGroups, NetworkManagementConfig, NetworkManagementEngine,
-    NetworkManagementFrame, NmWireState, WakeUpFrame, ENGINE, REPEAT_MESSAGE_MS, UNDERWAY,
+    ClusterNmState, ENGINE, FunctionalGroups, NetworkManagementConfig, NetworkManagementEngine,
+    NetworkManagementFrame, NmWireState, REPEAT_MESSAGE_MS, UNDERWAY, WakeUpFrame,
 };
 
 use crate::SimError;

@@ -1,7 +1,7 @@
 //! `Pelorus.WakeUp` frame (`04-power.md` §4.1).
 
 use crate::bus::CanFdFrame;
-use crate::wire::{pack_identifier, unpack_identifier, DC_ID_WAKE_UP, PRIORITY_WAKE_UP};
+use crate::wire::{DC_ID_WAKE_UP, PRIORITY_WAKE_UP, pack_identifier, unpack_identifier};
 
 use super::FunctionalGroups;
 

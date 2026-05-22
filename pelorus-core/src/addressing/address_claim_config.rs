@@ -1,6 +1,6 @@
 //! Address-claim engine configuration (`05-addressing.md` §3).
 
-use super::{listen_timing::MAX_CLAIMED_ADDRESS, listen_timing::DEFAULT_LISTEN_MS, Name};
+use super::{Name, listen_timing::DEFAULT_LISTEN_MS, listen_timing::MAX_CLAIMED_ADDRESS};
 
 /// Engine configuration.
 #[derive(Debug, Clone, Copy)]

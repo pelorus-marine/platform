@@ -13,7 +13,7 @@ mod wake_up_frame;
 
 pub use cluster_nm_state::ClusterNmState;
 pub use functional_groups::{
-    FunctionalGroups, ANCHOR_WATCH, COMMS, DOMESTIC, ENGINE, STORM, UNDERWAY, V1_STD_MASK,
+    ANCHOR_WATCH, COMMS, DOMESTIC, ENGINE, FunctionalGroups, STORM, UNDERWAY, V1_STD_MASK,
 };
 pub use network_management_config::NetworkManagementConfig;
 pub use network_management_engine::NetworkManagementEngine;

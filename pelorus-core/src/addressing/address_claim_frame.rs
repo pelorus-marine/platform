@@ -1,9 +1,7 @@
 //! `Pelorus.AddressClaim` frame (`05-addressing.md`, `07` §1.4).
 
 use crate::bus::CanFdFrame;
-use crate::wire::{
-    pack_identifier, unpack_identifier, DC_ID_ADDRESS_CLAIM, PRIORITY_ADDRESSING,
-};
+use crate::wire::{DC_ID_ADDRESS_CLAIM, PRIORITY_ADDRESSING, pack_identifier, unpack_identifier};
 
 use super::Name;
 
