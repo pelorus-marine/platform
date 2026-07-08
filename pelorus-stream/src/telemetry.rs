@@ -5,7 +5,7 @@ use crate::correlation::CorrelationSlot;
 /// Telemetry frame as seen after transport decryption (ordering TBD — placeholder).
 ///
 /// Carries [`CorrelationSlot`] so publishers can optionally attach **`Vessel.*`** paths,
-/// aligning with **`core/06-signal-catalog`** linkage rules for Stream payloads.
+/// aligning with **`catalog/04-overlays`** Stream linkage rules.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TelemetryEnvelope<'a> {
     /// Uninterpreted payload (future: CBOR, codec-specific slice).
