@@ -1,5 +1,3 @@
-# Propagate minimum test thread stack to all workspace members (`dbc-rs` builders need it;
-# Cargo only reads configs walking up from the current working directory, so `dbc-rs/.cargo`
-# alone does not apply when running `cargo test` from the workspace root).
+# Propagate minimum test thread stack to workspace members that run deep builder stacks.
 [env]
 RUST_MIN_STACK = "8388608" # 8 MB

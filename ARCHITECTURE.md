@@ -11,7 +11,7 @@ This file is the **project-facing** record for the **[`pelorus-marine/platform`]
 
 ### Mission (in this repository)
 
-Ship a **coherent Rust workspace** for Pelorus: **Core integration** (`pelorus-core`), **Stream** and **State** scaffolds, **host tooling** (Inspector), and **in-tree** libraries that exist to serve Pelorus first—**`dbc-rs`** (DBC) and **`mdf4-rs`** (MDF4 / VDR-oriented logging)—not as independent product ends.
+Ship a **coherent Rust workspace** for Pelorus: **Core integration** (`pelorus-core`), **Stream** and **State** scaffolds, **host tooling** (Inspector), and **external** libraries consumed via crates.io—**[`dbc-rs`](https://github.com/sigmatactical-org/dbc-rs)** (DBC) and **[`mdf4-rs`](https://github.com/sigmatactical-org/mdf4-rs)** (MDF4 / VDR-oriented logging).
 
 **Pelorus first** — product direction and **[`specifications/`](https://github.com/pelorus-marine/specifications)** define what lands; crates.io and upstream subtrees are downstream of that.
 
@@ -46,9 +46,7 @@ For the wider **Legacy Marine Data Ecosystem (LMDE)** context, problem statement
 
 | Path | Role |
 |------|------|
-| [`pelorus-bounded/`](pelorus-bounded/) | Bounded strings and collections; **`dbc-rs`** `compat` re-exports for firmware-friendly types. |
-| [`dbc-rs/`](dbc-rs/) | DBC parser — **in-tree subtree**; consumed by **`pelorus-core`** via `path` dependencies. |
-| [`mdf4-rs/`](mdf4-rs/) | MDF4 library — **in-tree subtree**; VDR / logging paths on capable hosts. |
+| [`pelorus-bounded/`](pelorus-bounded/) | Bounded strings and collections for firmware-friendly types in **`pelorus-core`**. |
 | [`pelorus-core/`](pelorus-core/) | **Core integration** — DCID schema, optional CAN decode, VDR hooks, own-ship snapshots for charting. See [`pelorus-core/ARCHITECTURE.md`](pelorus-core/ARCHITECTURE.md). |
 | [`pelorus-stream/`](pelorus-stream/) | Stream transport scaffolding; depends on **`pelorus-core`** with tight feature control. |
 | [`pelorus-state/`](pelorus-state/) | State fusion scaffolding; optional **`pelorus-stream`** via features. |
@@ -67,17 +65,20 @@ Conceptually:
 
 - **`pelorus-core`** sits at the center for **DCIDs**, CAN/DBC integration, and ECDIS-facing snapshots.
 - **`pelorus-stream`** and **`pelorus-state`** build **on** Core types with bounded coupling (see crate READMEs).
-- **`dbc-rs`** / **`mdf4-rs`** are **support libraries** pulled in through **`pelorus-core`** features—not parallel “products” competing with Core.
+- **[`dbc-rs`](https://github.com/sigmatactical-org/dbc-rs)** / **[`mdf4-rs`](https://github.com/sigmatactical-org/mdf4-rs)** are **external crates** consumed by **`pelorus-inspector`** (and future VDR paths)—not workspace members.
 
 Detailed graphs and M7 vs Linux split live in **[`pelorus-core/ARCHITECTURE.md`](pelorus-core/ARCHITECTURE.md)**.
 
 ---
 
-## 5. Supporting libraries (`dbc-rs`, `mdf4-rs`)
+## 5. External libraries (`dbc-rs`, `mdf4-rs`)
 
-These directories are **squashed subtree** snapshots maintained **here** for Pelorus. **`pelorus-core`** uses **`path`** dependencies. Optional standalone org repos (**`pelorus-marine/dbc-rs`**, **`pelorus-marine/mdf4-rs`**) remain **deferred** unless publishing policy requires them; subtrees in this workspace stay authoritative for day-to-day work.
+These crates are maintained by **Sigma Tactical Group** in separate repositories:
 
-Subtree pulls from upstream, when needed, follow **`README.md`** and contributor docs.
+- **[`sigmatactical-org/dbc-rs`](https://github.com/sigmatactical-org/dbc-rs)** — DBC parsing and CAN decode/encode
+- **[`sigmatactical-org/mdf4-rs`](https://github.com/sigmatactical-org/mdf4-rs)** — ASAM MDF4 read/write and bus logging
+
+This workspace pins them in **`[workspace.dependencies]`** and pulls from **crates.io**. Report bugs and contribute upstream in those repos.
 
 ---
 

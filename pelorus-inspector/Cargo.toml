@@ -43,8 +43,8 @@ thiserror = "2"
 log = "0.4"
 parking_lot = "0.12"
 
-dbc-rs = { path = "../dbc-rs", version = "0.5.1", features = ["std", "embedded-can"] }
-mdf4-rs = { path = "../mdf4-rs", version = "0.3.1" }
+dbc-rs = { workspace = true }
+mdf4-rs = { workspace = true }
 
 embedded-can = { workspace = true }
 clap = { version = "4", features = ["derive"] }

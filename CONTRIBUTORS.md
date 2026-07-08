@@ -10,9 +10,9 @@ Pelorus Marine is a **complete, transparent, community-driven** maritime softwar
 
 Individual attribution lives primarily in **Git history**. For release archaeology or credits lines in manifests, see **`authors`** in each crate’s **`Cargo.toml`** (Pelorus Marine contributors).
 
-## Subtree libraries (`dbc-rs`, `mdf4-rs`)
+## External libraries (`dbc-rs`, `mdf4-rs`)
 
-Crates **`dbc-rs`** and **`mdf4-rs`** keep their **published names on crates.io** for continuity. **Pelorus Marine is the curator** of the in-tree copies in [`pelorus-marine/platform`](https://github.com/pelorus-marine/platform): development for the Pelorus-aligned tree happens there. **Upstream lineage** (prior standalone repos and contributors) is acknowledged in each crate’s **`README.md`** — thank you to everyone who shaped those libraries before they became Pelorus subtree dependencies.
+Crates **`dbc-rs`** and **`mdf4-rs`** keep their **published names on crates.io** for continuity. They are maintained by **Sigma Tactical Group** at **[`sigmatactical-org/dbc-rs`](https://github.com/sigmatactical-org/dbc-rs)** and **[`sigmatactical-org/mdf4-rs`](https://github.com/sigmatactical-org/mdf4-rs)**. This workspace consumes them via crates.io; prior Pelorus in-tree copies and upstream lineage are acknowledged with gratitude.
 
 ## Thank you
 

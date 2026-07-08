@@ -2,7 +2,7 @@
 
 Desktop tooling for sailors and integrators **by sailors, for sailors**: inspect CAN traffic from **MDF4**, decode with **DBC**, and capture live **SocketCAN** (Linux) — built with **Tauri 2**.
 
-This package is the **successor** to the archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer). Source of truth lives in **`pelorus-marine/platform`** ([`pelorus-inspector/` tree](https://github.com/pelorus-marine/platform/tree/main/pelorus-inspector)). In-tree **`dbc-rs`** / **`mdf4-rs`** satisfy `path` deps for the Pelorus stack.
+This package is the **successor** to the archived [`reneherrero/can-viewer`](https://github.com/reneherrero/can-viewer). Source of truth lives in **`pelorus-marine/platform`** ([`pelorus-inspector/` tree](https://github.com/pelorus-marine/platform/tree/main/pelorus-inspector)). **`dbc-rs`** and **`mdf4-rs`** are external crates from [`sigmatactical-org`](https://github.com/sigmatactical-org) (crates.io).
 
 **Embedded-first:** host tooling visualizes and edits what vessel-side stacks produce; policy lives in **[Embedded-first](../README.md#embedded-first)**.
 

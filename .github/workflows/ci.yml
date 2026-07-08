@@ -49,20 +49,6 @@ jobs:
 
       - run: cargo check -p pelorus-core --no-default-features --features alloc --verbose
 
-  dbc-rs-heapless:
-    name: dbc-rs + pelorus-bounded (heapless, no alloc)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-
-      - run: cargo check -p pelorus-bounded --no-default-features --features heapless --verbose
-
-      - run: cargo check -p dbc-rs --no-default-features --features heapless,attributes --verbose
-
   clippy:
     name: Clippy (workspace)
     runs-on: ubuntu-latest
